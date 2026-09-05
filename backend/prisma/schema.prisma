@@ -47,6 +47,10 @@ model Organization {
   auditLogs       AuditLog[]
   activities      Activity[]
   upsellRules     UpsellRule[]
+  priceLists      PriceList[]
+  approvalChains  ApprovalChain[]
+  creditNotes     CreditNote[]
+  healthAlerts    DealHealthAlert[]
 }
 
 model User {
@@ -130,6 +134,10 @@ model Account {
   size            String?       // "1-50", "51-200", "201-1000", "1000+"
   segment         String        @default("MID_MARKET") // ENTERPRISE, MID_MARKET, SMB, STARTUP
   tier            String        @default("BRONZE")     // BRONZE (5%), SILVER (10%), GOLD (15%), PLATINUM (20%)
+  tierSetBy       String        @default("SELF")       // SELF, ADMIN
+  tierLockedByAdmin Boolean     @default(false)
+  portalEmail     String?
+  portalPasswordHash String?
   website         String?
   phone           String?
   address         String?
@@ -145,6 +153,7 @@ model Account {
   invoices        Invoice[]
   subscriptions   Subscription[]
   revenueRecords  RevenueRecord[]
+  creditNotes     CreditNote[]
   activities      Activity[]
 }
 
@@ -192,10 +201,13 @@ model Product {
 
   organization       Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   plans              ProductPlan[]
+  variants           ProductVariant[]
+  priceLists         PriceList[]
   stockItems         Stock[]
   quoteItems         QuoteItem[]
   invoiceItems       InvoiceItem[]
   subscriptions      Subscription[]
+  backorders         Backorder[]
   upsellSources      UpsellRule[]   @relation("SourceProduct")
   upsellTargets      UpsellRule[]   @relation("TargetProduct")
 }
@@ -230,6 +242,7 @@ model Warehouse {
   organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   stockItems      Stock[]
   quoteItems      QuoteItem[]
+  splits          FulfillmentSplit[]
 }
 
 model Stock {
@@ -318,6 +331,7 @@ model Deal {
   invoices        Invoice[]
   subscriptions   Subscription[]
   revenueRecords  RevenueRecord[]
+  healthAlerts    DealHealthAlert[]
   activities      Activity[]
 }
 
@@ -357,6 +371,9 @@ model Quote {
   approvals       Approval[]
   contracts       Contract[]
   versions        QuoteVersion[]
+  splits          FulfillmentSplit[]
+  backorders      Backorder[]
+  messages        NegotiationMessage[]
 }
 
 model QuoteVersion {
@@ -397,6 +414,7 @@ model QuoteItem {
   product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
   productPlan     ProductPlan?  @relation(fields: [productPlanId], references: [id], onDelete: SetNull)
   warehouse       Warehouse?    @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
+  schedules       BillingSchedule[]
 }
 
 // -------------------------------------------------------------
@@ -643,3 +661,123 @@ model Activity {
   account         Account?      @relation(fields: [accountId], references: [id], onDelete: Cascade)
   lead            Lead?         @relation(fields: [leadId], references: [id], onDelete: Cascade)
 }
+
+// -------------------------------------------------------------
+// 10. Extended CPQ & Operations Entities
+// -------------------------------------------------------------
+
+model ProductVariant {
+  id            String   @id @default(uuid())
+  productId     String
+  attributeName String
+  value         String
+  extraPrice    Float    @default(0.0)
+  createdAt     DateTime @default(now())
+
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model PriceList {
+  id             String       @id @default(uuid())
+  organizationId String
+  customerTier   String       // BRONZE, SILVER, GOLD, PLATINUM
+  currency       String       @default("INR")
+  productId      String
+  price          Float
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  product        Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ApprovalChain {
+  id               String       @id @default(uuid())
+  organizationId   String
+  name             String
+  discountRangeMin Float        @default(0.0)
+  discountRangeMax Float        @default(100.0)
+  requiresManager  Boolean      @default(true)
+  requiresFinance  Boolean      @default(false)
+  requiresAdmin    Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model FulfillmentSplit {
+  id                   String    @id @default(uuid())
+  quoteId              String
+  warehouseId          String
+  quantity             Int
+  shipmentCostEstimate Float     @default(0.0)
+  isOverride           Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+
+  quote                Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  warehouse            Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+}
+
+model Backorder {
+  id              String    @id @default(uuid())
+  quoteId         String
+  productId       String
+  quantityPending Int
+  status          String    @default("PENDING") // PENDING, FULFILLED, CANCELLED
+  consolidatedAt  DateTime?
+  createdAt       DateTime  @default(now())
+
+  quote           Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model BillingSchedule {
+  id             String     @id @default(uuid())
+  quoteItemId    String?
+  subscriptionId String?
+  dueDate        DateTime
+  amount         Float
+  status         String     @default("PENDING") // PENDING, INVOICED, PAID
+  createdAt      DateTime   @default(now())
+
+  quoteItem      QuoteItem? @relation(fields: [quoteItemId], references: [id], onDelete: SetNull)
+}
+
+model CreditNote {
+  id             String        @id @default(uuid())
+  organizationId String
+  accountId      String
+  quoteId        String?
+  amount         Float
+  reason         String
+  issuedAt       DateTime      @default(now())
+
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  account        Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model NegotiationMessage {
+  id                     String   @id @default(uuid())
+  quoteId                String
+  sender                 String   // "CUSTOMER" or "REP"
+  message                String
+  counterDiscountPercent Float?
+  createdAt              DateTime @default(now())
+
+  quote                  Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model DealHealthAlert {
+  id             String       @id @default(uuid())
+  organizationId String
+  dealId         String?
+  quoteId        String?
+  type           String       // STALLED, DISCOUNT_ANOMALY, DELIVERY_SLIP
+  message        String
+  resolved       Boolean      @default(false)
+  resolvedAt     DateTime?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal           Deal?        @relation(fields: [dealId], references: [id], onDelete: Cascade)
+}
+

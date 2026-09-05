@@ -181,10 +181,50 @@ const deleteAccount = async (req, res) => {
   }
 };
 
+/**
+ * Admin Override Customer Tier (Locks tier from self-modification)
+ */
+const adminOverrideCustomerTier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tier } = req.body;
+
+    const account = await prisma.account.findUnique({ where: { id } });
+    if (!account || account.organizationId !== req.organizationId) {
+      return error(res, 'Account not found', null, 404);
+    }
+
+    const updated = await prisma.account.update({
+      where: { id },
+      data: {
+        tier,
+        tierSetBy: 'ADMIN',
+        tierLockedByAdmin: true,
+        updatedAt: new Date(),
+      },
+    });
+
+    await logAudit({
+      organizationId: req.organizationId,
+      userId: req.user.id,
+      action: 'CUSTOMER_TIER_ADMIN_LOCKED',
+      entity: 'ACCOUNT',
+      entityId: id,
+      previousState: { tier: account.tier, tierSetBy: account.tierSetBy, tierLockedByAdmin: account.tierLockedByAdmin },
+      newState: { tier, tierSetBy: 'ADMIN', tierLockedByAdmin: true },
+    });
+
+    return success(res, `Customer tier locked to ${tier} by Administrator`, updated);
+  } catch (err) {
+    return error(res, 'Failed to override customer tier', err.message, 500);
+  }
+};
+
 module.exports = {
   getAccounts,
   getAccountById,
   createAccount,
   updateAccount,
   deleteAccount,
+  adminOverrideCustomerTier,
 };

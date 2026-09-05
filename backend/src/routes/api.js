@@ -25,10 +25,18 @@ const auditController = require('../controllers/auditController');
 // -------------------------------------------------------------
 router.post('/auth/login', authController.login);
 router.post('/auth/register', authController.register);
+router.post('/auth/signup', authController.register); // alias
+
+// Customer Portal Auth (Dedicated flow)
+router.post('/portal/auth/signup', authController.portalSignup);
+router.post('/portal/auth/login', authController.portalLogin);
 
 // Customer Portal Public Endpoints (Accessible with Quote ID)
 router.get('/portal/quotes/:id', quoteController.getPortalQuote);
+router.get('/portal/quotations/:id', quoteController.getPortalQuote); // alias
 router.post('/portal/quotes/:id/negotiate', quoteController.submitCustomerNegotiation);
+router.post('/portal/quotations/:id/messages', quoteController.submitCustomerNegotiation); // alias
+router.post('/portal/quotations/:id/confirm', quoteController.submitCustomerNegotiation); // alias
 
 // -------------------------------------------------------------
 // Protected Routes (Require JWT & Active Organization)
@@ -38,9 +46,11 @@ router.use(authenticate);
 // Auth & Session
 router.get('/auth/me', authController.getMe);
 router.post('/auth/demo-switch', authController.switchDemoUser);
+router.put('/portal/profile/tier', authController.updatePortalTier);
 
 // Dashboard & Health Monitoring
 router.get('/dashboard/overview', dashboardController.getDashboardOverview);
+router.get('/dashboard/deal-health', dashboardController.getDashboardOverview); // alias
 router.post('/dashboard/health-action', dashboardController.triggerHealthAction);
 
 // Leads
@@ -51,12 +61,14 @@ router.put('/leads/:id', leadController.updateLead);
 router.post('/leads/:id/convert', leadController.convertLead);
 router.delete('/leads/:id', leadController.deleteLead);
 
-// Accounts
+// Customers / Accounts
 router.get('/accounts', accountController.getAccounts);
 router.get('/accounts/:id', accountController.getAccountById);
 router.post('/accounts', accountController.createAccount);
 router.put('/accounts/:id', accountController.updateAccount);
 router.delete('/accounts/:id', accountController.deleteAccount);
+router.put('/customers/:id/tier', accountController.adminOverrideCustomerTier);
+router.put('/accounts/:id/tier', accountController.adminOverrideCustomerTier); // alias
 
 // Contacts
 router.get('/contacts', contactController.getContacts);

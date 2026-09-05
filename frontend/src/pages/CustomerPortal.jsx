@@ -82,7 +82,13 @@ export const CustomerPortal = () => {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Quotation Number</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Quotation Number</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200">
+                  Customer Tier: {quote.deal?.account?.tier || 'BRONZE'}
+                  {quote.deal?.account?.tierLockedByAdmin ? ' (🔒 Admin Locked)' : ' (Self-Configured)'}
+                </span>
+              </div>
               <h2 className="text-xl font-mono font-bold text-slate-900 mt-0.5">{quote.quoteNumber}</h2>
               <p className="text-xs text-slate-600 mt-1">
                 Prepared for <strong className="text-slate-900">{quote.deal?.account?.name}</strong> • Rep: {quote.deal?.owner?.firstName} {quote.deal?.owner?.lastName}
@@ -90,7 +96,7 @@ export const CustomerPortal = () => {
             </div>
             <div className="text-right">
               <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Total Proposed Amount</span>
-              <strong className="text-2xl font-mono font-extrabold text-brand-700">
+              <strong className="text-2xl font-mono font-extrabold text-teal-700">
                 ₹{quote.totalAmount?.toLocaleString('en-IN')}
               </strong>
             </div>

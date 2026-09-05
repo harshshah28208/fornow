@@ -263,9 +263,156 @@ const switchDemoUser = async (req, res) => {
   }
 };
 
+/**
+ * Customer Portal Self-Registration with Tier Selection
+ */
+const portalSignup = async (req, res) => {
+  try {
+    const { companyName, email, password, tier = 'BRONZE' } = req.body;
+    if (!companyName || !email || !password) {
+      return error(res, 'Company name, email, and password are required', null, 400);
+    }
+
+    // Find default demo organization
+    const org = await prisma.organization.findFirst();
+    if (!org) return error(res, 'No active organization found', null, 500);
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const validTiers = ['BRONZE', 'SILVER', 'GOLD'];
+    const chosenTier = validTiers.includes(tier.toUpperCase()) ? tier.toUpperCase() : 'BRONZE';
+
+    const account = await prisma.account.create({
+      data: {
+        organizationId: org.id,
+        name: companyName,
+        tier: chosenTier,
+        tierSetBy: 'SELF',
+        tierLockedByAdmin: false,
+        portalEmail: email.toLowerCase().trim(),
+        portalPasswordHash: passwordHash,
+        status: 'ACTIVE',
+      },
+    });
+
+    await logAudit({
+      organizationId: org.id,
+      action: 'CUSTOMER_PORTAL_SIGNUP',
+      entity: 'ACCOUNT',
+      entityId: account.id,
+      newState: { name: companyName, email, tier: chosenTier, tierSetBy: 'SELF' },
+    });
+
+    const token = generateToken({
+      userId: account.id,
+      organizationId: org.id,
+      role: 'CUSTOMER',
+    });
+
+    return success(res, 'Customer registration successful', {
+      token,
+      customer: {
+        id: account.id,
+        name: account.name,
+        email: account.portalEmail,
+        tier: account.tier,
+        tierLockedByAdmin: account.tierLockedByAdmin,
+      },
+    }, 201);
+  } catch (err) {
+    return error(res, 'Portal registration failed', err.message, 500);
+  }
+};
+
+/**
+ * Customer Portal Login
+ */
+const portalLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return error(res, 'Email and password are required', null, 400);
+    }
+
+    const account = await prisma.account.findFirst({
+      where: { portalEmail: email.toLowerCase().trim() },
+    });
+
+    if (!account || !account.portalPasswordHash) {
+      return error(res, 'Invalid customer credentials', null, 401);
+    }
+
+    const isMatch = await bcrypt.compare(password, account.portalPasswordHash);
+    if (!isMatch) {
+      return error(res, 'Invalid customer credentials', null, 401);
+    }
+
+    const token = generateToken({
+      userId: account.id,
+      organizationId: account.organizationId,
+      role: 'CUSTOMER',
+    });
+
+    return success(res, 'Customer login successful', {
+      token,
+      customer: {
+        id: account.id,
+        name: account.name,
+        email: account.portalEmail,
+        tier: account.tier,
+        tierLockedByAdmin: account.tierLockedByAdmin,
+      },
+    });
+  } catch (err) {
+    return error(res, 'Portal login failed', err.message, 500);
+  }
+};
+
+/**
+ * Customer Updates Own Tier from Portal (blocked if locked by Admin)
+ */
+const updatePortalTier = async (req, res) => {
+  try {
+    const accountId = req.user.id;
+    const { tier } = req.body;
+
+    const account = await prisma.account.findUnique({ where: { id: accountId } });
+    if (!account) return error(res, 'Customer account not found', null, 404);
+
+    if (account.tierLockedByAdmin) {
+      return error(res, 'Customer tier has been locked by Administrator and cannot be self-modified.', null, 403);
+    }
+
+    const validTiers = ['BRONZE', 'SILVER', 'GOLD'];
+    if (!validTiers.includes(tier)) {
+      return error(res, 'Invalid tier. Choose BRONZE, SILVER, or GOLD.', null, 400);
+    }
+
+    const updated = await prisma.account.update({
+      where: { id: accountId },
+      data: { tier, tierSetBy: 'SELF', updatedAt: new Date() },
+    });
+
+    await logAudit({
+      organizationId: account.organizationId,
+      action: 'CUSTOMER_TIER_SELF_UPDATED',
+      entity: 'ACCOUNT',
+      entityId: accountId,
+      previousState: { tier: account.tier },
+      newState: { tier, tierSetBy: 'SELF' },
+    });
+
+    return success(res, `Tier updated to ${tier}`, updated);
+  } catch (err) {
+    return error(res, 'Failed to update tier', err.message, 500);
+  }
+};
+
 module.exports = {
   login,
   register,
   getMe,
   switchDemoUser,
+  portalSignup,
+  portalLogin,
+  updatePortalTier,
 };
