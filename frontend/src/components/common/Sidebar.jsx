@@ -42,6 +42,7 @@ export const Sidebar = () => {
       items: [
         { label: 'Discount Approvals', path: '/approvals', icon: CheckCircle2 },
         { label: 'Contracts & Legal', path: '/contracts', icon: FileSignature },
+        { label: 'Customer Portal Demo', path: '/portal/QT-2026-0001-V1', icon: Sparkles },
       ],
     },
     {
@@ -49,6 +50,7 @@ export const Sidebar = () => {
       items: [
         { label: 'Products & Plans', path: '/products', icon: Package },
         { label: 'Warehouses & Stock', path: '/warehouses', icon: Boxes },
+        { label: 'CPQ Quote Builder', path: '/quotes/new', icon: FileSpreadsheet },
       ],
     },
     {
