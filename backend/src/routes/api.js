@@ -82,9 +82,13 @@ router.put('/deals/:id', dealController.updateDeal);
 router.post('/deals/:id/stage', dealController.updateDealStage);
 
 // Quotes & Pricing Engine
+router.get('/quotes', quoteController.getQuotes);
+router.post('/quotes', quoteController.saveQuote);
 router.post('/quotes/preview', quoteController.previewQuotePricing);
 router.post('/quotes/save', quoteController.saveQuote);
 router.get('/quotes/:id', quoteController.getQuoteById);
+router.put('/quotes/:id/stage', quoteController.updateQuoteStage);
+router.post('/quotes/:id/versions', quoteController.createQuoteVersion);
 
 // Discount Approvals
 router.get('/approvals', approvalController.getApprovals);
@@ -96,14 +100,18 @@ router.post('/contracts', contractController.createContract);
 router.post('/contracts/:id/review', contractController.legalReviewDecision);
 router.post('/contracts/:id/sign', contractController.signContract);
 
-// Finance: Invoices & Payments
+// Finance: Invoices, Subscriptions & Payments
 router.get('/invoices', invoiceController.getInvoices);
 router.get('/invoices/:id', invoiceController.getInvoiceById);
 router.post('/invoices/generate', invoiceController.createInvoiceFromDeal);
 router.post('/invoices/payment', invoiceController.recordPayment);
+router.get('/subscriptions', invoiceController.getSubscriptions);
+router.post('/subscriptions', invoiceController.createSubscription);
+router.post('/subscriptions/:id/cancel', invoiceController.cancelSubscription);
 
-// Revenue & Analytics
+// Revenue, Forecasting & Reports
 router.get('/revenue/analytics', revenueController.getRevenueAnalytics);
+router.get('/reports', revenueController.getReportsAnalytics);
 
 // Settings, Discount Rules & Users
 router.get('/settings/organization', settingsController.getOrgSettings);

@@ -82,6 +82,75 @@ const getRevenueAnalytics = async (req, res) => {
   }
 };
 
+const getReportsAnalytics = async (req, res) => {
+  try {
+    const deals = await prisma.deal.findMany({
+      where: { organizationId: req.organizationId },
+      include: { account: true, owner: true, quotes: true },
+    });
+
+    const products = await prisma.product.findMany({
+      where: { organizationId: req.organizationId },
+      include: { quoteItems: true },
+    });
+
+    // 1. Weighted pipeline calculation
+    const weightedPipeline = deals.reduce((sum, d) => sum + (d.value * (d.probability / 100)), 0);
+    const totalPipelineValue = deals.reduce((sum, d) => sum + d.value, 0);
+
+    // 2. Product Performance
+    const productPerformance = products.map((p) => {
+      const unitsSold = p.quoteItems.reduce((sum, it) => sum + it.quantity, 0);
+      const grossRevenue = p.quoteItems.reduce((sum, it) => sum + it.totalAmount, 0);
+      return {
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        unitsSold,
+        grossRevenue,
+        basePrice: p.basePrice,
+      };
+    }).sort((a, b) => b.grossRevenue - a.grossRevenue);
+
+    // 3. Rep Commission Calculation (e.g. 5% commission on closed won, 2% on pipeline)
+    const reps = await prisma.user.findMany({
+      where: { organizationId: req.organizationId },
+      include: { ownedDeals: true },
+    });
+
+    const repCommissions = reps.map((rep) => {
+      const wonDeals = rep.ownedDeals.filter((d) => d.stage === 'CLOSED_WON' || d.stage === 'APPROVED');
+      const wonAmount = wonDeals.reduce((sum, d) => sum + d.value, 0);
+      const pipelineAmount = rep.ownedDeals.reduce((sum, d) => sum + d.value, 0);
+      const commission = wonAmount * 0.05; // 5% baseline
+
+      return {
+        id: rep.id,
+        name: `${rep.firstName} ${rep.lastName}`,
+        role: rep.role,
+        dealsCount: rep.ownedDeals.length,
+        wonAmount,
+        pipelineAmount,
+        estimatedCommission: commission,
+      };
+    });
+
+    return success(res, 'Reports analytics generated', {
+      weightedPipeline: Number(weightedPipeline.toFixed(2)),
+      totalPipelineValue: Number(totalPipelineValue.toFixed(2)),
+      productPerformance,
+      repCommissions,
+      dealStageBreakdown: deals.reduce((acc, d) => {
+        acc[d.stage] = (acc[d.stage] || 0) + 1;
+        return acc;
+      }, {}),
+    });
+  } catch (err) {
+    return error(res, 'Failed to generate reports', err.message, 500);
+  }
+};
+
 module.exports = {
   getRevenueAnalytics,
+  getReportsAnalytics,
 };

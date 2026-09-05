@@ -356,6 +356,24 @@ model Quote {
   items           QuoteItem[]
   approvals       Approval[]
   contracts       Contract[]
+  versions        QuoteVersion[]
+}
+
+model QuoteVersion {
+  id              String        @id @default(uuid())
+  quoteId         String
+  versionNumber   Int
+  subtotal        Float
+  discountPercent Float
+  discountAmount  Float
+  taxAmount       Float
+  totalAmount     Float
+  status          String
+  changesNotes    String?
+  snapshotData    String?       // JSON stringified items snapshot
+  createdAt       DateTime      @default(now())
+
+  quote           Quote         @relation(fields: [quoteId], references: [id], onDelete: Cascade)
 }
 
 model QuoteItem {

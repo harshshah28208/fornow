@@ -754,6 +754,159 @@ async function main() {
     },
   });
 
+  // Quote 3: Draft Quote (for Inbound Qualified Deal)
+  const quoteDraft = await prisma.quote.create({
+    data: {
+      organizationId: org.id,
+      dealId: nexusDeal.id,
+      version: 2,
+      quoteNumber: 'QT-2026-0003-V2',
+      status: 'DRAFT',
+      subtotal: 650000,
+      costSubtotal: 450000,
+      discountPercent: 5.0,
+      discountAmount: 32500,
+      blendedRiskScore: 1.0,
+      requiredApprovalRole: null,
+      taxAmount: 111150,
+      totalAmount: 728650,
+      oneTimeTotal: 728650,
+      recurringTotal: 0,
+      billingFrequency: 'ONE_TIME',
+      marginPercent: 38.2,
+      notes: 'Hardware upgrade proposal for expansion dev floor.',
+      items: {
+        create: [
+          {
+            productId: workstation.id,
+            warehouseId: mainWh.id,
+            quantity: 3,
+            unitPrice: 185000,
+            costPrice: 135000,
+            discountPercent: 5.0,
+            discountAmount: 27750,
+            taxAmount: 94905,
+            totalAmount: 622155,
+            billingModel: 'ONE_TIME',
+          },
+        ],
+      },
+    },
+  });
+
+  // Quote 4: Negotiation Stage Quote with Customer Counter-Offer
+  const quoteNegotiation = await prisma.quote.create({
+    data: {
+      organizationId: org.id,
+      dealId: zenithDeal.id,
+      version: 2,
+      quoteNumber: 'QT-2026-0004-V2',
+      status: 'NEGOTIATION',
+      subtotal: 840000,
+      costSubtotal: 620000,
+      discountPercent: 12.0,
+      discountAmount: 100800,
+      blendedRiskScore: 3.5,
+      requiredApprovalRole: 'SALES_MANAGER',
+      taxAmount: 133056,
+      totalAmount: 872256,
+      oneTimeTotal: 872256,
+      recurringTotal: 0,
+      billingFrequency: 'MONTHLY',
+      marginPercent: 28.9,
+      notes: 'Customer countered with 12% discount and requested 10-day SLA guarantee.',
+      customerFeedback: 'Can we lock in 12% discount if we sign 24-month contract?',
+      customerCounterDiscount: 12.0,
+      items: {
+        create: [
+          {
+            productId: rackServer.id,
+            quantity: 2,
+            unitPrice: 420000,
+            costPrice: 310000,
+            discountPercent: 12.0,
+            discountAmount: 100800,
+            taxAmount: 133056,
+            totalAmount: 872256,
+            billingModel: 'ONE_TIME',
+          },
+        ],
+      },
+    },
+  });
+
+  // Quote 5: Confirmed / Accepted Quote
+  const quoteConfirmed = await prisma.quote.create({
+    data: {
+      organizationId: org.id,
+      dealId: nexusDeal.id,
+      version: 3,
+      quoteNumber: 'QT-2026-0005-V3',
+      status: 'ACCEPTED',
+      subtotal: 1200000,
+      costSubtotal: 820000,
+      discountPercent: 8.0,
+      discountAmount: 96000,
+      blendedRiskScore: 1.5,
+      requiredApprovalRole: 'SALES_MANAGER',
+      taxAmount: 198720,
+      totalAmount: 1302720,
+      oneTimeTotal: 1302720,
+      recurringTotal: 0,
+      billingFrequency: 'ANNUAL',
+      marginPercent: 37.0,
+      notes: 'Client confirmed and accepted quotation terms via customer portal.',
+      customerFeedback: 'Accepted quotation terms. Ready for contract.',
+      acceptedAt: new Date(),
+      items: {
+        create: [
+          {
+            productId: workstation.id,
+            warehouseId: southHub.id,
+            quantity: 6,
+            unitPrice: 185000,
+            costPrice: 135000,
+            discountPercent: 8.0,
+            discountAmount: 88800,
+            taxAmount: 183816,
+            totalAmount: 1205016,
+            billingModel: 'ONE_TIME',
+          },
+        ],
+      },
+    },
+  });
+
+  // Active Subscriptions
+  await prisma.subscription.createMany({
+    data: [
+      {
+        organizationId: org.id,
+        accountId: accNexus.id,
+        dealId: nexusDeal.id,
+        productId: cloudSaaS.id,
+        status: 'ACTIVE',
+        billingCycle: 'MONTHLY',
+        recurringAmount: 175000,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+      {
+        organizationId: org.id,
+        accountId: accZenith.id,
+        dealId: zenithDeal.id,
+        productId: premiumSLA.id,
+        status: 'ACTIVE',
+        billingCycle: 'ANNUAL',
+        recurringAmount: 300000,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        nextBillingDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      },
+    ],
+  });
+
   // 13. Audit Log Entries
   await prisma.auditLog.createMany({
     data: [

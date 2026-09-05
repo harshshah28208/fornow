@@ -407,10 +407,171 @@ const submitCustomerNegotiation = async (req, res) => {
   }
 };
 
+/**
+ * Retrieve all quotes for Kanban board and Table views.
+ */
+const getQuotes = async (req, res) => {
+  try {
+    const { status, search } = req.query;
+    const where = { organizationId: req.organizationId };
+
+    if (status && status !== 'ALL') {
+      if (status === 'CONFIRMED') {
+        where.status = { in: ['ACCEPTED', 'CONFIRMED'] };
+      } else {
+        where.status = status;
+      }
+    }
+
+    if (search && search.trim()) {
+      where.OR = [
+        { quoteNumber: { contains: search, mode: 'insensitive' } },
+        { deal: { title: { contains: search, mode: 'insensitive' } } },
+        { deal: { account: { name: { contains: search, mode: 'insensitive' } } } },
+      ];
+    }
+
+    const quotes = await prisma.quote.findMany({
+      where,
+      include: {
+        deal: {
+          include: {
+            account: true,
+            owner: true,
+          },
+        },
+        items: {
+          include: {
+            product: true,
+            warehouse: true,
+          },
+        },
+        approvals: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+        versions: {
+          orderBy: { versionNumber: 'desc' },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return success(res, 'Quotes retrieved successfully', quotes);
+  } catch (err) {
+    return error(res, 'Failed to fetch quotations', err.message, 500);
+  }
+};
+
+/**
+ * Update quotation stage/status with governance validation.
+ */
+const updateQuoteStage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { stage, notes } = req.body;
+
+    const quote = await prisma.quote.findUnique({
+      where: { id },
+      include: { deal: { include: { account: true, owner: true } }, items: { include: { product: true } } },
+    });
+
+    if (!quote || quote.organizationId !== req.organizationId) {
+      return error(res, 'Quote not found', null, 404);
+    }
+
+    const validStages = ['DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'SENT', 'NEGOTIATION', 'ACCEPTED', 'CONFIRMED', 'REJECTED'];
+    if (!validStages.includes(stage)) {
+      return error(res, `Invalid quote stage: ${stage}`, null, 400);
+    }
+
+    const oldStatus = quote.status;
+    const updateData = { status: stage, updatedAt: new Date() };
+
+    if (stage === 'SENT' && !quote.sentAt) updateData.sentAt = new Date();
+    if ((stage === 'ACCEPTED' || stage === 'CONFIRMED') && !quote.acceptedAt) updateData.acceptedAt = new Date();
+
+    const updated = await prisma.quote.update({
+      where: { id: quote.id },
+      data: updateData,
+      include: { deal: { include: { account: true, owner: true } }, items: { include: { product: true } } },
+    });
+
+    // Update corresponding deal stage
+    let correspondingDealStage = quote.deal.stage;
+    if (stage === 'PENDING_APPROVAL') correspondingDealStage = 'APPROVAL_REQUIRED';
+    if (stage === 'APPROVED') correspondingDealStage = 'APPROVED';
+    if (stage === 'NEGOTIATION') correspondingDealStage = 'NEGOTIATION';
+    if (stage === 'ACCEPTED' || stage === 'CONFIRMED') correspondingDealStage = 'CONTRACT_REVIEW';
+
+    await prisma.deal.update({
+      where: { id: quote.dealId },
+      data: { stage: correspondingDealStage, lastActivityAt: new Date() },
+    });
+
+    // Audit Log
+    await logAudit({
+      organizationId: req.organizationId,
+      userId: req.user.id,
+      action: 'QUOTE_STAGE_CHANGED',
+      entity: 'QUOTE',
+      entityId: quote.id,
+      previousState: { status: oldStatus },
+      newState: { status: stage, notes },
+    });
+
+    return success(res, `Quote transitioned to ${stage}`, updated);
+  } catch (err) {
+    return error(res, 'Failed to update quote stage', err.message, 500);
+  }
+};
+
+/**
+ * Save snapshot of current quote into QuoteVersion table.
+ */
+const createQuoteVersion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    const quote = await prisma.quote.findUnique({
+      where: { id },
+      include: { items: { include: { product: true } } },
+    });
+
+    if (!quote || quote.organizationId !== req.organizationId) {
+      return error(res, 'Quote not found', null, 404);
+    }
+
+    const currentVersionsCount = await prisma.quoteVersion.count({ where: { quoteId: quote.id } });
+    const versionRecord = await prisma.quoteVersion.create({
+      data: {
+        quoteId: quote.id,
+        versionNumber: currentVersionsCount + 1,
+        subtotal: quote.subtotal,
+        discountPercent: quote.discountPercent,
+        discountAmount: quote.discountAmount,
+        taxAmount: quote.taxAmount,
+        totalAmount: quote.totalAmount,
+        status: quote.status,
+        changesNotes: notes || `Revision snapshot v${currentVersionsCount + 1}`,
+        snapshotData: JSON.stringify(quote.items),
+      },
+    });
+
+    return success(res, 'Quote version snapshot created', versionRecord, 201);
+  } catch (err) {
+    return error(res, 'Failed to create quote version', err.message, 500);
+  }
+};
+
 module.exports = {
+  getQuotes,
   previewQuotePricing,
   saveQuote,
   getQuoteById,
+  updateQuoteStage,
+  createQuoteVersion,
   getPortalQuote,
   submitCustomerNegotiation,
 };

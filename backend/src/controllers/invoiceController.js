@@ -100,9 +100,85 @@ const recordPayment = async (req, res) => {
   }
 };
 
+const getSubscriptions = async (req, res) => {
+  try {
+    const { status = 'ALL', accountId } = req.query;
+    const where = { organizationId: req.organizationId };
+
+    if (status && status !== 'ALL') where.status = status;
+    if (accountId) where.accountId = accountId;
+
+    const subscriptions = await prisma.subscription.findMany({
+      where,
+      include: {
+        account: true,
+        product: true,
+        productPlan: true,
+        deal: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return success(res, 'Subscriptions retrieved', subscriptions);
+  } catch (err) {
+    return error(res, 'Failed to fetch subscriptions', err.message, 500);
+  }
+};
+
+const createSubscription = async (req, res) => {
+  try {
+    const { accountId, dealId, productId, productPlanId, recurringAmount, billingCycle = 'MONTHLY' } = req.body;
+    if (!accountId || !productId || !recurringAmount) {
+      return error(res, 'accountId, productId, and recurringAmount are required', null, 400);
+    }
+
+    const nextBilling = new Date();
+    if (billingCycle === 'ANNUAL') nextBilling.setFullYear(nextBilling.getFullYear() + 1);
+    else if (billingCycle === 'QUARTERLY') nextBilling.setMonth(nextBilling.getMonth() + 3);
+    else nextBilling.setMonth(nextBilling.getMonth() + 1);
+
+    const subscription = await prisma.subscription.create({
+      data: {
+        organizationId: req.organizationId,
+        accountId,
+        dealId: dealId || null,
+        productId,
+        productPlanId: productPlanId || null,
+        recurringAmount: parseFloat(recurringAmount),
+        billingCycle,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: nextBilling,
+        nextBillingDate: nextBilling,
+        status: 'ACTIVE',
+      },
+      include: { account: true, product: true, productPlan: true },
+    });
+
+    return success(res, 'Subscription created successfully', subscription, 201);
+  } catch (err) {
+    return error(res, 'Failed to create subscription', err.message, 500);
+  }
+};
+
+const cancelSubscription = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await prisma.subscription.update({
+      where: { id },
+      data: { status: 'CANCELLED', updatedAt: new Date() },
+    });
+    return success(res, 'Subscription cancelled', updated);
+  } catch (err) {
+    return error(res, 'Failed to cancel subscription', err.message, 500);
+  }
+};
+
 module.exports = {
   getInvoices,
   getInvoiceById,
   createInvoiceFromDeal,
   recordPayment,
+  getSubscriptions,
+  createSubscription,
+  cancelSubscription,
 };

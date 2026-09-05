@@ -18,6 +18,9 @@ import {
   ShieldAlert,
   LogOut,
   Sparkles,
+  Activity,
+  Truck,
+  BarChart3,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -27,11 +30,18 @@ export const Sidebar = () => {
 
   const navSections = [
     {
-      title: 'Sales Engine',
+      title: 'Sales & Deal Engine',
       items: [
         { label: 'Executive Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { label: 'Quotations Board', path: '/quotations', icon: FileSpreadsheet },
         { label: 'Deal Pipeline', path: '/pipeline', icon: Kanban },
         { label: 'Deals 360', path: '/deals', icon: FileSpreadsheet },
+        { label: 'Deal Health Radar', path: '/deal-health', icon: Activity },
+      ],
+    },
+    {
+      title: 'CRM & Pipeline',
+      items: [
         { label: 'Leads & Inbound', path: '/leads', icon: Users },
         { label: 'Accounts & Tiers', path: '/accounts', icon: Building2 },
         { label: 'Contacts Directory', path: '/contacts', icon: Contact },
@@ -46,22 +56,25 @@ export const Sidebar = () => {
       ],
     },
     {
-      title: 'Operations & Inventory',
+      title: 'Operations & Fulfillment',
       items: [
-        { label: 'Products & Plans', path: '/products', icon: Package },
+        { label: 'Fulfillment Milestones', path: '/fulfillment', icon: Truck },
+        { label: 'Products & Pricing', path: '/products', icon: Package },
         { label: 'Warehouses & Stock', path: '/warehouses', icon: Boxes },
         { label: 'CPQ Quote Builder', path: '/quotes/new', icon: FileSpreadsheet },
       ],
     },
     {
-      title: 'Finance & Revenue',
+      title: 'Finance & Revenue Ops',
       items: [
         { label: 'Invoices', path: '/invoices', icon: Receipt },
-        { label: 'Payments & Revenue', path: '/revenue', icon: TrendingUp },
+        { label: 'Subscriptions', path: '/subscriptions', icon: CreditCard },
+        { label: 'Revenue Analytics', path: '/revenue', icon: TrendingUp },
+        { label: 'Executive Reports', path: '/reports', icon: BarChart3 },
       ],
     },
     {
-      title: 'System & Admin',
+      title: 'System & Governance',
       items: [
         { label: 'Settings & Rules', path: '/settings', icon: Settings },
         { label: 'Audit Trail', path: '/audit-logs', icon: ShieldAlert },
