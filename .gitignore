@@ -10,14 +10,20 @@ coverage/
 dist/
 build/
 
-# Misc
-.DS_Store
-*.pem
+# Database SQLite files
+*.db
+*.db-journal
+
+# Environment
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Misc
+.DS_Store
+*.pem
 
 # IDEs
 .vscode/

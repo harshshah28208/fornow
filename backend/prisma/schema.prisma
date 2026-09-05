@@ -1,0 +1,627 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -------------------------------------------------------------
+// 1. Multi-Tenancy & User Management
+// -------------------------------------------------------------
+
+model Organization {
+  id              String         @id @default(uuid())
+  name            String
+  slug            String         @unique
+  logo            String?
+  currency        String         @default("INR")
+  currencySymbol  String         @default("₹")
+  timezone        String         @default("Asia/Kolkata")
+  plan            String         @default("ENTERPRISE")
+  subscriptionStatus String      @default("ACTIVE")
+  billingCycle    String         @default("ANNUAL")
+  renewalDate     DateTime?
+  maxUsers        Int            @default(50)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  users           User[]
+  teams           Team[]
+  accounts        Account[]
+  contacts        Contact[]
+  leads           Lead[]
+  products        Product[]
+  warehouses      Warehouse[]
+  discountRules   DiscountRule[]
+  deals           Deal[]
+  quotes          Quote[]
+  approvals       Approval[]
+  contracts       Contract[]
+  invoices        Invoice[]
+  payments        Payment[]
+  subscriptions   Subscription[]
+  revenueRecords  RevenueRecord[]
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+  activities      Activity[]
+  upsellRules     UpsellRule[]
+}
+
+model User {
+  id              String        @id @default(uuid())
+  organizationId  String
+  email           String        @unique
+  passwordHash    String
+  firstName       String
+  lastName        String
+  role            String        @default("SALES_REP") // SUPER_ADMIN, ORG_ADMIN, SALES_REP, SALES_MANAGER, FINANCE, LEGAL, OPERATIONS
+  avatar          String?
+  phone           String?
+  title           String?
+  isActive        Boolean       @default(true)
+  historicalAvgDiscount Float   @default(5.0) // Used for anomaly detection
+  teamId          String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team            Team?         @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  assignedLeads   Lead[]
+  ownedAccounts   Account[]
+  ownedDeals      Deal[]
+  requestedApprovals Approval[] @relation("RequestedBy")
+  reviewedApprovals  Approval[] @relation("Approver")
+  reviewedContracts  Contract[] @relation("LegalReviewer")
+  activities      Activity[]
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+}
+
+model Team {
+  id              String        @id @default(uuid())
+  organizationId  String
+  name            String
+  managerId       String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users           User[]
+}
+
+// -------------------------------------------------------------
+// 2. CRM Modules (Leads, Accounts, Contacts)
+// -------------------------------------------------------------
+
+model Lead {
+  id              String        @id @default(uuid())
+  organizationId  String
+  ownerId         String?
+  firstName       String
+  lastName        String
+  company         String
+  email           String
+  phone           String?
+  source          String        @default("WEBSITE") // WEBSITE, REFERRAL, COLD_CALL, CAMPAIGN, PARTNER
+  status          String        @default("NEW")     // NEW, CONTACTED, QUALIFIED, UNQUALIFIED, CONVERTED, LOST
+  estimatedValue  Float         @default(0.0)
+  notes           String?
+  followUpDate    DateTime?
+  convertedAccountId  String?
+  convertedContactId  String?
+  convertedDealId     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner           User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  activities      Activity[]
+}
+
+model Account {
+  id              String        @id @default(uuid())
+  organizationId  String
+  ownerId         String?
+  name            String
+  industry        String?
+  size            String?       // "1-50", "51-200", "201-1000", "1000+"
+  segment         String        @default("MID_MARKET") // ENTERPRISE, MID_MARKET, SMB, STARTUP
+  tier            String        @default("BRONZE")     // BRONZE (5%), SILVER (10%), GOLD (15%), PLATINUM (20%)
+  website         String?
+  phone           String?
+  address         String?
+  status          String        @default("ACTIVE")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner           User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  contacts        Contact[]
+  deals           Deal[]
+  contracts       Contract[]
+  invoices        Invoice[]
+  subscriptions   Subscription[]
+  revenueRecords  RevenueRecord[]
+  activities      Activity[]
+}
+
+model Contact {
+  id              String        @id @default(uuid())
+  organizationId  String
+  accountId       String
+  firstName       String
+  lastName        String
+  email           String
+  phone           String?
+  jobTitle        String?
+  isDecisionMaker Boolean       @default(false)
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  account         Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  deals           Deal[]
+}
+
+// -------------------------------------------------------------
+// 3. Products, Warehouses & Inventory
+// -------------------------------------------------------------
+
+model Product {
+  id                 String         @id @default(uuid())
+  organizationId     String
+  name               String
+  code               String
+  category           String         // HARDWARE, SERVICES, SUBSCRIPTION
+  billingModel       String         @default("ONE_TIME") // ONE_TIME, RECURRING
+  basePrice          Float
+  costPrice          Float          @default(0.0)
+  currency           String         @default("INR")
+  unit               String         @default("Unit")     // Unit, Seat, Hour, License
+  taxPercent         Float          @default(18.0)
+  maxDiscountPercent Float          @default(15.0)
+  description        String?
+  isPromoted         Boolean        @default(false)      // For upsell ranking
+  isActive           Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  organization       Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plans              ProductPlan[]
+  stockItems         Stock[]
+  quoteItems         QuoteItem[]
+  invoiceItems       InvoiceItem[]
+  subscriptions      Subscription[]
+  upsellSources      UpsellRule[]   @relation("SourceProduct")
+  upsellTargets      UpsellRule[]   @relation("TargetProduct")
+}
+
+model ProductPlan {
+  id              String        @id @default(uuid())
+  productId       String
+  name            String        // "Monthly Standard", "Annual Pro", "Enterprise Dedicated"
+  billingCycle    String        @default("MONTHLY") // MONTHLY, QUARTERLY, ANNUAL
+  price           Float
+  setupFee        Float         @default(0.0)
+  description     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quoteItems      QuoteItem[]
+  subscriptions   Subscription[]
+}
+
+model Warehouse {
+  id              String        @id @default(uuid())
+  organizationId  String
+  name            String        // "Main Warehouse", "East Depot", "West Hub"
+  code            String
+  location        String?
+  shippingCostWeight Float      @default(1.0) // Used for auto-split minimization
+  isMain          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  stockItems      Stock[]
+  quoteItems      QuoteItem[]
+}
+
+model Stock {
+  id              String        @id @default(uuid())
+  productId       String
+  warehouseId     String
+  quantity        Int           @default(0)
+  reservedQty     Int           @default(0)
+  minReplenishQty Int           @default(10)
+  updatedAt       DateTime      @updatedAt
+
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse       Warehouse     @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, warehouseId])
+}
+
+model UpsellRule {
+  id                 String       @id @default(uuid())
+  organizationId     String
+  sourceProductId    String
+  suggestedProductId String
+  confidenceScore    Float        @default(0.85) // Co-purchase confidence
+  marginDelta        Float        @default(12.5) // Projected margin increase %
+  promotionTag       String?      // "Recommended Pairing", "Best Value Add-on"
+  createdAt          DateTime     @default(now())
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sourceProduct      Product      @relation("SourceProduct", fields: [sourceProductId], references: [id], onDelete: Cascade)
+  suggestedProduct   Product      @relation("TargetProduct", fields: [suggestedProductId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------------------------
+// 4. Discount Governance & Rules
+// -------------------------------------------------------------
+
+model DiscountRule {
+  id              String        @id @default(uuid())
+  organizationId  String
+  name            String
+  customerTier    String?       // ALL, BRONZE, SILVER, GOLD, PLATINUM
+  productCategory String?       // ALL, HARDWARE, SERVICES, SUBSCRIPTION
+  maxRepDiscount  Float         @default(5.0)   // Rep can approve automatically
+  maxManagerDiscount Float      @default(15.0)  // Manager can approve
+  maxFinanceDiscount Float      @default(30.0)  // Finance can approve
+  sequenceOrder   Int           @default(1)
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------------------------
+// 5. Deals, Quotations & Items
+// -------------------------------------------------------------
+
+model Deal {
+  id              String        @id @default(uuid())
+  organizationId  String
+  accountId       String
+  contactId       String?
+  ownerId         String?
+  title           String
+  value           Float         @default(0.0)
+  costTotal       Float         @default(0.0)
+  marginPercent   Float         @default(0.0)
+  stage           String        @default("LEAD") 
+  // LEAD, QUALIFIED, OPPORTUNITY, QUOTE_DRAFT, QUOTE_SENT, NEGOTIATION, APPROVAL_REQUIRED, APPROVED, CONTRACT_REVIEW, CONTRACT_APPROVED, CLOSED_WON, CLOSED_LOST
+  probability     Int           @default(10)
+  expectedCloseDate DateTime?
+  lossReason      String?
+  deliveryPromiseDate DateTime? // Delivery slippage detection
+  lastActivityAt  DateTime      @default(now()) // Stalled deals detection
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  account         Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  contact         Contact?      @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  owner           User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  quotes          Quote[]
+  approvals       Approval[]
+  contracts       Contract[]
+  invoices        Invoice[]
+  subscriptions   Subscription[]
+  revenueRecords  RevenueRecord[]
+  activities      Activity[]
+}
+
+model Quote {
+  id              String        @id @default(uuid())
+  organizationId  String
+  dealId          String
+  version         Int           @default(1)
+  quoteNumber     String
+  status          String        @default("DRAFT")
+  // DRAFT, PENDING_APPROVAL, APPROVED, SENT, NEGOTIATION, ACCEPTED, REJECTED
+  subtotal        Float         @default(0.0)
+  costSubtotal    Float         @default(0.0)
+  discountPercent Float         @default(0.0)
+  discountAmount  Float         @default(0.0)
+  blendedRiskScore Float        @default(0.0) // Computed across mixed line discounts
+  requiredApprovalRole String?  // NONE, SALES_MANAGER, FINANCE, ORG_ADMIN
+  taxAmount       Float         @default(0.0)
+  totalAmount     Float         @default(0.0)
+  oneTimeTotal    Float         @default(0.0)
+  recurringTotal  Float         @default(0.0)
+  billingFrequency String       @default("MONTHLY") // ONE_TIME, MONTHLY, QUARTERLY, ANNUAL
+  marginPercent   Float         @default(0.0)
+  notes           String?
+  terms           String?
+  customerFeedback String?      // From Customer Negotiation Portal
+  customerCounterDiscount Float?// Customer proposed counter discount %
+  expiresAt       DateTime?
+  sentAt          DateTime?
+  acceptedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal            Deal          @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  items           QuoteItem[]
+  approvals       Approval[]
+  contracts       Contract[]
+}
+
+model QuoteItem {
+  id              String        @id @default(uuid())
+  quoteId         String
+  productId       String
+  productPlanId   String?
+  warehouseId     String?       // Assigned warehouse after fulfillment split
+  quantity        Int           @default(1)
+  unitPrice       Float
+  costPrice       Float         @default(0.0)
+  discountPercent Float         @default(0.0)
+  discountAmount  Float         @default(0.0)
+  taxAmount       Float         @default(0.0)
+  totalAmount     Float
+  billingModel    String        @default("ONE_TIME") // ONE_TIME, RECURRING
+  isBackorder     Boolean       @default(false)
+  backorderQty    Int           @default(0)
+
+  quote           Quote         @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productPlan     ProductPlan?  @relation(fields: [productPlanId], references: [id], onDelete: SetNull)
+  warehouse       Warehouse?    @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
+}
+
+// -------------------------------------------------------------
+// 6. Approval Engine
+// -------------------------------------------------------------
+
+model Approval {
+  id                 String        @id @default(uuid())
+  organizationId     String
+  quoteId            String
+  dealId             String
+  requestedById      String
+  approverId         String?
+  approverRole       String        // SALES_MANAGER, FINANCE, ORG_ADMIN
+  requestedDiscount  Float
+  thresholdDiscount  Float
+  riskScore          Float         @default(0.0)
+  reason             String?
+  status             String        @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  comments           String?
+  decidedAt          DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  organization       Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  quote              Quote         @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  deal               Deal          @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  requestedBy        User          @relation("RequestedBy", fields: [requestedById], references: [id], onDelete: Cascade)
+  approver           User?         @relation("Approver", fields: [approverId], references: [id], onDelete: SetNull)
+}
+
+// -------------------------------------------------------------
+// 7. Contracts & Legal Management
+// -------------------------------------------------------------
+
+model Contract {
+  id                 String            @id @default(uuid())
+  organizationId     String
+  dealId             String
+  quoteId            String
+  accountId          String
+  contractNumber     String            @unique
+  title              String
+  value              Float
+  startDate          DateTime          @default(now())
+  endDate            DateTime?
+  terms              String
+  status             String            @default("DRAFT")
+  // DRAFT, LEGAL_REVIEW, CHANGES_REQUESTED, APPROVED, SENT, SIGNED, EXPIRED, CANCELLED
+  legalReviewerId    String?
+  legalNotes         String?
+  signedAt           DateTime?
+  signerName         String?
+  signerEmail        String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  organization       Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal               Deal              @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  quote              Quote             @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  account            Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  legalReviewer      User?             @relation("LegalReviewer", fields: [legalReviewerId], references: [id], onDelete: SetNull)
+  versions           ContractVersion[]
+  invoices           Invoice[]
+}
+
+model ContractVersion {
+  id                 String        @id @default(uuid())
+  contractId         String
+  version            Int
+  terms              String
+  changesDescription String?
+  createdById        String?
+  createdAt          DateTime      @default(now())
+
+  contract           Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------------------------
+// 8. Finance, Hybrid Invoices & Payment Tracking
+// -------------------------------------------------------------
+
+model Invoice {
+  id              String        @id @default(uuid())
+  organizationId  String
+  dealId          String?
+  contractId      String?
+  accountId       String
+  invoiceNumber   String        @unique
+  issueDate       DateTime      @default(now())
+  dueDate         DateTime
+  subtotal        Float
+  discountAmount  Float         @default(0.0)
+  taxAmount       Float         @default(0.0)
+  totalAmount     Float
+  amountPaid      Float         @default(0.0)
+  amountDue       Float
+  status          String        @default("DRAFT")
+  // DRAFT, ISSUED, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deal            Deal?         @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  contract        Contract?     @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  account         Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  items           InvoiceItem[]
+  payments        Payment[]
+  revenueRecords  RevenueRecord[]
+}
+
+model InvoiceItem {
+  id              String        @id @default(uuid())
+  invoiceId       String
+  productId       String?
+  description     String
+  quantity        Int           @default(1)
+  unitPrice       Float
+  discountAmount  Float         @default(0.0)
+  taxAmount       Float         @default(0.0)
+  totalAmount     Float
+  billingType     String        @default("ONE_TIME") // ONE_TIME, RECURRING
+
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product         Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  organizationId  String
+  invoiceId       String
+  paymentNumber   String        @unique
+  amount          Float
+  paymentDate     DateTime      @default(now())
+  paymentMethod   String        @default("BANK_TRANSFER") // BANK_TRANSFER, CREDIT_CARD, UPI, CHECK
+  reference       String?
+  notes           String?
+  status          String        @default("COMPLETED") // COMPLETED, PENDING, FAILED
+  createdAt       DateTime      @default(now())
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                 String        @id @default(uuid())
+  organizationId     String
+  accountId          String
+  dealId             String?
+  productId          String
+  productPlanId      String?
+  status             String        @default("ACTIVE") // ACTIVE, PAST_DUE, CANCELLED
+  billingCycle       String        @default("MONTHLY") // MONTHLY, QUARTERLY, ANNUAL
+  recurringAmount    Float
+  currentPeriodStart DateTime      @default(now())
+  currentPeriodEnd   DateTime
+  nextBillingDate    DateTime
+  prorationBalance   Float         @default(0.0)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  organization       Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  account            Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  deal               Deal?         @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  product            Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productPlan        ProductPlan?  @relation(fields: [productPlanId], references: [id], onDelete: SetNull)
+}
+
+model RevenueRecord {
+  id              String        @id @default(uuid())
+  organizationId  String
+  invoiceId       String?
+  dealId          String?
+  accountId       String?
+  amount          Float
+  type            String        @default("ONE_TIME") // ONE_TIME, RECURRING
+  recognizedDate  DateTime      @default(now())
+  periodMonth     Int
+  periodYear      Int
+  notes           String?
+  createdAt       DateTime      @default(now())
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invoice         Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  deal            Deal?         @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  account         Account?      @relation(fields: [accountId], references: [id], onDelete: SetNull)
+}
+
+// -------------------------------------------------------------
+// 9. Operations, Audit, Activity & Notifications
+// -------------------------------------------------------------
+
+model Notification {
+  id              String        @id @default(uuid())
+  organizationId  String
+  userId          String
+  title           String
+  message         String
+  type            String        @default("INFO") // INFO, APPROVAL_REQUEST, APPROVAL_DECISION, CONTRACT_REVIEW, PAYMENT, STALLED_DEAL, ANOMALY
+  entityType      String?       // DEAL, QUOTE, CONTRACT, INVOICE, LEAD
+  entityId        String?
+  isRead          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id              String        @id @default(uuid())
+  organizationId  String
+  userId          String?
+  action          String        // DISCOUNT_REQUESTED, DISCOUNT_APPROVED, DEAL_STAGE_CHANGED, etc.
+  entity          String        // DEAL, QUOTE, CONTRACT, INVOICE, LEAD, USER
+  entityId        String
+  previousState   String?       // JSON stringified state
+  newState        String?       // JSON stringified state
+  ipAddress       String?
+  createdAt       DateTime      @default(now())
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Activity {
+  id              String        @id @default(uuid())
+  organizationId  String
+  userId          String?
+  dealId          String?
+  accountId       String?
+  leadId          String?
+  type            String        @default("NOTE") // CALL, MEETING, EMAIL, NOTE, TASK
+  subject         String
+  description     String?
+  dueDate         DateTime?
+  isCompleted     Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  deal            Deal?         @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  account         Account?      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  lead            Lead?         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
