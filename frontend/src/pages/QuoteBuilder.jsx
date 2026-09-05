@@ -187,21 +187,21 @@ export const QuoteBuilder = () => {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-brand-400" /> Quotation Builder & Pricing Engine
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-teal-600" /> Quotation Builder & Pricing Engine
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Build multi-line quotes with live margin telemetry, blended risk governance, and multi-warehouse split.
           </p>
         </div>
 
         {/* Target Deal Selector */}
         <div className="flex items-center gap-3">
-          <label className="text-xs font-semibold text-slate-400">Target Deal:</label>
+          <label className="text-xs font-bold text-slate-600">Target Deal:</label>
           <select
             value={selectedDealId}
             onChange={(e) => setSelectedDealId(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-semibold"
+            className="border border-slate-300 rounded-xl px-4 py-2 text-xs text-slate-900 focus:outline-none focus:border-teal-600 font-bold bg-white"
           >
             <option value="">-- Choose Opportunity --</option>
             {deals.map((d) => (
@@ -215,17 +215,17 @@ export const QuoteBuilder = () => {
 
       {/* Target Account Badge Strip */}
       {selectedDeal && (
-        <div className="glass-panel p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+        <div className="glass-panel p-4 rounded-2xl border border-slate-200 bg-white flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-3 text-xs">
-            <Building2 className="w-4 h-4 text-brand-400" />
-            <span className="text-white font-bold">{selectedDeal.account?.name}</span>
+            <Building2 className="w-4 h-4 text-teal-600" />
+            <span className="text-slate-900 font-extrabold">{selectedDeal.account?.name}</span>
             <TierBadge tier={selectedDeal.account?.tier} />
-            <span className="text-slate-400">
-              Discretionary Ceiling: <strong className="text-brand-300 font-mono">{selectedDeal.account?.tier === 'GOLD' ? '15%' : selectedDeal.account?.tier === 'SILVER' ? '10%' : '5%'}</strong>
+            <span className="text-slate-500">
+              Allowed Ceiling: <strong className="text-teal-700 font-mono font-bold">{selectedDeal.account?.tier === 'GOLD' ? '15%' : selectedDeal.account?.tier === 'SILVER' ? '10%' : '5%'}</strong>
             </span>
           </div>
-          <span className="text-[11px] text-slate-400">
-            Current Stage: <strong className="text-slate-200">{selectedDeal.stage}</strong>
+          <span className="text-[11px] text-slate-500">
+            Current Stage: <strong className="text-slate-800">{selectedDeal.stage}</strong>
           </span>
         </div>
       )}
@@ -234,34 +234,34 @@ export const QuoteBuilder = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Product Selector (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Package className="w-4 h-4 text-brand-400" /> Product Catalog
+          <div className="glass-panel p-5 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-xs">
+            <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <Package className="w-4 h-4 text-teal-600" /> Product Catalog (PostgreSQL)
             </h3>
             <div className="space-y-3 max-h-[550px] overflow-y-auto pr-1">
               {products.map((p) => (
                 <div
                   key={p.id}
-                  className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 hover:border-brand-500/40 transition-all flex items-center justify-between gap-3 group"
+                  className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-teal-500 transition-all flex items-center justify-between gap-3 group"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-bold text-white group-hover:text-brand-300 transition-colors truncate">
+                      <h4 className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors truncate">
                         {p.name}
                       </h4>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
                         {p.category}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{p.description}</p>
-                    <div className="flex items-center gap-3 text-[11px] font-mono mt-1 text-slate-300">
-                      <span>Base: <strong>₹{p.basePrice.toLocaleString('en-IN')}</strong></span>
-                      <span className="text-slate-400">Avail Stock: {p.availableStock}</span>
+                    <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{p.description}</p>
+                    <div className="flex items-center gap-3 text-[11px] font-mono mt-1 text-slate-700">
+                      <span>Base: <strong className="text-slate-900">₹{p.basePrice.toLocaleString('en-IN')}</strong></span>
+                      <span className="text-slate-500">Avail Stock: {p.availableStock}</span>
                     </div>
                   </div>
                   <button
                     onClick={() => handleAddProduct(p)}
-                    className="p-2 bg-brand-500/15 hover:bg-brand-500/30 text-brand-300 border border-brand-500/30 rounded-lg text-xs font-bold transition-all flex-shrink-0"
+                    className="p-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-300 rounded-lg text-xs font-bold transition-all flex-shrink-0"
                     title="Add to Quote"
                   >
                     <Plus className="w-4 h-4" />
@@ -274,22 +274,22 @@ export const QuoteBuilder = () => {
 
         {/* Right Column: Cart & Pricing & Governance (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Layers className="w-4 h-4 text-brand-400" /> Quotation Cart ({cartItems.length} items)
+          <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white space-y-6 shadow-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-teal-600" /> Quotation Cart ({cartItems.length} items)
               </h3>
 
               {/* Order Level Discount Input */}
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-slate-400 font-semibold">Bulk Discount %:</span>
+                <span className="text-slate-600 font-bold">Bulk Discount %:</span>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={orderDiscount}
                   onChange={(e) => handleApplyOrderDiscount(e.target.value)}
-                  className="w-16 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-center text-amber-400 font-bold focus:outline-none focus:border-brand-500 font-mono text-xs"
+                  className="w-16 border border-slate-300 rounded-lg px-2 py-1 text-center text-amber-800 font-bold focus:outline-none focus:border-teal-600 font-mono text-xs"
                 />
               </div>
             </div>
@@ -308,18 +308,18 @@ export const QuoteBuilder = () => {
                   return (
                     <div
                       key={index}
-                      className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs"
+                      className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <strong className="text-white font-bold">{product?.name}</strong>
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300">
+                          <strong className="text-slate-900 font-bold">{product?.name}</strong>
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-semibold">
                             {product?.category}
                           </span>
                         </div>
                         <button
                           onClick={() => handleRemoveItem(index)}
-                          className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
+                          className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -327,38 +327,38 @@ export const QuoteBuilder = () => {
 
                       <div className="grid grid-cols-4 gap-3 pt-2 items-center">
                         <div>
-                          <label className="text-[10px] text-slate-400 block mb-0.5">Quantity</label>
+                          <label className="text-[10px] text-slate-500 font-bold block mb-0.5">Quantity</label>
                           <input
                             type="number"
                             min="1"
                             value={item.quantity}
                             onChange={(e) => handleUpdateItem(index, 'quantity', parseInt(e.target.value || 1, 10))}
-                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-center font-mono text-white text-xs"
+                            className="w-full border border-slate-300 rounded-lg p-1.5 text-center font-mono text-slate-900 font-bold text-xs"
                           />
                         </div>
 
                         <div>
-                          <label className="text-[10px] text-slate-400 block mb-0.5">Line Discount %</label>
+                          <label className="text-[10px] text-slate-500 font-bold block mb-0.5">Line Discount %</label>
                           <input
                             type="number"
                             min="0"
                             max="100"
                             value={item.discountPercent}
                             onChange={(e) => handleUpdateItem(index, 'discountPercent', parseFloat(e.target.value || 0))}
-                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-center font-mono text-amber-400 font-bold text-xs"
+                            className="w-full border border-slate-300 rounded-lg p-1.5 text-center font-mono text-amber-800 font-bold text-xs"
                           />
                         </div>
 
                         <div>
-                          <label className="text-[10px] text-slate-400 block mb-0.5">Line Margin</label>
-                          <span className="font-mono text-emerald-400 font-bold block pt-1">
+                          <label className="text-[10px] text-slate-500 font-bold block mb-0.5">Line Margin</label>
+                          <span className="font-mono text-emerald-700 font-extrabold block pt-1">
                             {evalItem?.marginPercent || 32.5}%
                           </span>
                         </div>
 
                         <div className="text-right">
-                          <label className="text-[10px] text-slate-400 block mb-0.5">Line Total</label>
-                          <strong className="font-mono text-brand-400 font-bold text-sm block">
+                          <label className="text-[10px] text-slate-500 font-bold block mb-0.5">Line Total</label>
+                          <strong className="font-mono text-teal-700 font-black text-sm block">
                             ₹{evalItem?.totalAmount?.toLocaleString('en-IN') || (product?.basePrice * item.quantity).toLocaleString('en-IN')}
                           </strong>
                         </div>
@@ -373,30 +373,30 @@ export const QuoteBuilder = () => {
             {/* Live Telemetry: Blended Risk Score & Margin Engine */}
             {/* ------------------------------------------------------------- */}
             {previewData && (
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-950 to-slate-900 border border-slate-800 space-y-4 shadow-xl">
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                    <TrendingUp className="w-4 h-4 text-brand-400" /> Pricing & Governance Telemetry
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <TrendingUp className="w-4 h-4 text-teal-600" /> Pricing & Governance Telemetry
                   </span>
                   <RiskBadge riskScore={previewData.discountEval?.blendedRiskScore} />
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <span className="text-slate-400 text-[10px] block font-sans">Subtotal</span>
-                    <strong className="text-white">₹{previewData.pricing.subtotal.toLocaleString('en-IN')}</strong>
+                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+                    <span className="text-slate-500 text-[10px] block font-sans font-bold">Subtotal</span>
+                    <strong className="text-slate-900">₹{previewData.pricing.subtotal.toLocaleString('en-IN')}</strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <span className="text-slate-400 text-[10px] block font-sans">Discount Amt</span>
-                    <strong className="text-amber-400">-₹{previewData.pricing.discountAmount.toLocaleString('en-IN')}</strong>
+                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+                    <span className="text-slate-500 text-[10px] block font-sans font-bold">Discount</span>
+                    <strong className="text-amber-800">-₹{previewData.pricing.discountAmount.toLocaleString('en-IN')}</strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <span className="text-slate-400 text-[10px] block font-sans">Tax (18%)</span>
-                    <strong className="text-slate-300">₹{previewData.pricing.taxAmount.toLocaleString('en-IN')}</strong>
+                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+                    <span className="text-slate-500 text-[10px] block font-sans font-bold">Tax (18%)</span>
+                    <strong className="text-slate-700">₹{previewData.pricing.taxAmount.toLocaleString('en-IN')}</strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-brand-950/40 border border-brand-500/40">
-                    <span className="text-brand-300 text-[10px] block font-sans font-bold">Grand Total</span>
-                    <strong className="text-brand-400 text-sm font-extrabold">₹{previewData.pricing.totalAmount.toLocaleString('en-IN')}</strong>
+                  <div className="p-2.5 rounded-xl bg-teal-50 border border-teal-300">
+                    <span className="text-teal-900 text-[10px] block font-sans font-black">Grand Total</span>
+                    <strong className="text-teal-800 text-sm font-black">₹{previewData.pricing.totalAmount.toLocaleString('en-IN')}</strong>
                   </div>
                 </div>
 
@@ -404,15 +404,15 @@ export const QuoteBuilder = () => {
                 <div
                   className={`p-3.5 rounded-xl border text-xs ${
                     previewData.discountEval?.requiresApproval
-                      ? 'bg-rose-950/25 border-rose-800/50 text-rose-300'
-                      : 'bg-emerald-950/25 border-emerald-800/50 text-emerald-300'
+                      ? 'bg-rose-50 border-rose-300 text-rose-900'
+                      : 'bg-emerald-50 border-emerald-300 text-emerald-900'
                   }`}
                 >
                   <div className="flex items-center gap-2 font-bold mb-1">
                     {previewData.discountEval?.requiresApproval ? (
-                      <ShieldAlert className="w-4 h-4 text-rose-400" />
+                      <ShieldAlert className="w-4 h-4 text-rose-600" />
                     ) : (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     )}
                     <span>
                       {previewData.discountEval?.requiresApproval
@@ -420,19 +420,19 @@ export const QuoteBuilder = () => {
                         : 'Approved automatically (Within Sales Rep Discretion)'}
                     </span>
                   </div>
-                  <p className="text-[11px] leading-relaxed opacity-90">
+                  <p className="text-[11px] leading-relaxed font-medium">
                     {previewData.discountEval?.approvalReason}
                   </p>
                 </div>
 
                 {/* Warehouse Split Quick Trigger */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
-                  <span className="text-slate-400 flex items-center gap-1">
-                    <Truck className="w-3.5 h-3.5 text-brand-400" /> Auto-Split Warehouses: <strong>{previewData.warehouseSplit?.totalShipments || 1} Shipment(s)</strong>
+                <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
+                  <span className="text-slate-600 font-medium flex items-center gap-1">
+                    <Truck className="w-3.5 h-3.5 text-teal-600" /> Auto-Split Warehouses: <strong>{previewData.warehouseSplit?.totalShipments || 1} Shipment(s)</strong>
                   </span>
                   <button
                     onClick={() => setShowFulfillmentModal(true)}
-                    className="text-brand-400 hover:underline font-semibold"
+                    className="text-teal-700 hover:underline font-bold"
                   >
                     View Warehouse Split Details
                   </button>
@@ -441,11 +441,11 @@ export const QuoteBuilder = () => {
             )}
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
               <button
                 onClick={() => handleSaveQuote(false)}
                 disabled={submitting || !cartItems.length}
-                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-all"
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all"
               >
                 Save as Draft
               </button>
@@ -453,7 +453,7 @@ export const QuoteBuilder = () => {
               <button
                 onClick={() => handleSaveQuote(true)}
                 disabled={submitting || !cartItems.length}
-                className="px-6 py-2.5 bg-gradient-to-r from-brand-600 to-teal-500 hover:from-brand-500 hover:to-teal-400 text-slate-950 font-extrabold rounded-xl shadow-glow text-xs flex items-center gap-2 transition-all"
+                className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-extrabold rounded-xl shadow-sm text-xs flex items-center gap-2 transition-all"
               >
                 {submitting ? 'Submitting...' : previewData?.discountEval?.requiresApproval ? 'Submit for Approval' : 'Finalize & Approve Quote'}
                 <ArrowRight className="w-4 h-4" />
@@ -461,16 +461,14 @@ export const QuoteBuilder = () => {
             </div>
           </div>
 
-          {/* ------------------------------------------------------------- */}
-          {/* Live Upsell / Cross-Sell Suggestions (PDF Page 7, B5) */}
-          {/* ------------------------------------------------------------- */}
+          {/* Upsell Panel */}
           {upsells.length > 0 && (
-            <div className="glass-panel p-5 rounded-2xl border border-brand-500/30 space-y-4">
+            <div className="glass-panel p-5 rounded-2xl border border-teal-200 bg-white space-y-4 shadow-xs">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-brand-400" /> Recommended Upsells & Cross-Sell Add-ons
+                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-teal-600" /> Recommended Upsells & Cross-Sell Add-ons
                 </h4>
-                <span className="text-[10px] text-brand-300 font-semibold px-2 py-0.5 rounded bg-brand-500/10 border border-brand-500/20">
+                <span className="text-[10px] text-teal-800 font-bold px-2 py-0.5 rounded bg-teal-50 border border-teal-200">
                   AI Deal Optimizer
                 </span>
               </div>
@@ -479,25 +477,25 @@ export const QuoteBuilder = () => {
                 {upsells.map((u) => (
                   <div
                     key={u.id}
-                    className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-brand-500/40 transition-all space-y-2"
+                    className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-teal-400 transition-all space-y-2 shadow-xs"
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <h5 className="text-xs font-bold text-white line-clamp-1">{u.name}</h5>
-                        <span className="text-[10px] text-amber-400 font-semibold">{u.promotionTag}</span>
+                        <h5 className="text-xs font-bold text-slate-900 line-clamp-1">{u.name}</h5>
+                        <span className="text-[10px] text-amber-800 font-bold">{u.promotionTag}</span>
                       </div>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                      <span className="text-[10px] font-mono text-emerald-700 font-black">
                         +{u.marginDelta}% Margin
                       </span>
                     </div>
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
-                      <span className="font-mono text-xs text-white">₹{u.basePrice.toLocaleString('en-IN')}</span>
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200">
+                      <span className="font-mono text-xs text-slate-900 font-bold">₹{u.basePrice.toLocaleString('en-IN')}</span>
                       <button
                         onClick={() => {
                           const prod = products.find((p) => p.id === u.productId);
                           if (prod) handleAddProduct(prod);
                         }}
-                        className="px-2.5 py-1 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold rounded-lg text-[11px] transition-all"
+                        className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg text-[11px] transition-all shadow-xs"
                       >
                         + Add to Quote
                       </button>
@@ -510,36 +508,36 @@ export const QuoteBuilder = () => {
         </div>
       </div>
 
-      {/* Fulfillment & Warehouse Split Modal */}
+      {/* Fulfillment Split Modal */}
       <Modal
         isOpen={showFulfillmentModal}
         onClose={() => setShowFulfillmentModal(false)}
         title="Multi-Warehouse Fulfillment Split & Stock Allocation"
       >
         <div className="space-y-4 text-xs">
-          <p className="text-slate-300">
-            Based on real-time stock across hubs, DealFlow360 recommends splitting fulfillment to minimize shipping freight costs and transit delays.
+          <p className="text-slate-600 font-medium">
+            Based on real-time stock across hubs in PostgreSQL, DealFlow360 recommends splitting fulfillment to minimize shipping freight costs.
           </p>
 
           <div className="space-y-3">
             {previewData?.warehouseSplit?.warehouseShipments?.map((ws, i) => (
-              <div key={i} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+              <div key={i} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between shadow-xs">
                 <div>
-                  <h4 className="font-bold text-white">{ws.warehouseName}</h4>
-                  <p className="text-[11px] text-slate-400">{ws.totalUnits} Units • {ws.itemsCount} Product Line(s)</p>
+                  <h4 className="font-bold text-slate-900">{ws.warehouseName}</h4>
+                  <p className="text-[11px] text-slate-500 font-medium">{ws.totalUnits} Units • {ws.itemsCount} Product Line(s)</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-slate-400 text-[10px] block">Est. Freight Cost</span>
-                  <strong className="font-mono text-brand-300">₹{ws.estimatedCost.toLocaleString('en-IN')}</strong>
+                  <span className="text-slate-400 text-[10px] block font-bold uppercase">Est. Freight Cost</span>
+                  <strong className="font-mono text-teal-700 font-bold">₹{ws.estimatedCost.toLocaleString('en-IN')}</strong>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="flex justify-end pt-3 border-t border-slate-800">
+          <div className="flex justify-end pt-3 border-t border-slate-200">
             <button
               onClick={() => setShowFulfillmentModal(false)}
-              className="px-4 py-2 bg-brand-500 text-slate-950 font-bold rounded-lg shadow-glow"
+              className="px-4 py-2 bg-teal-600 text-white font-bold rounded-xl shadow-xs"
             >
               Accept Recommended Split
             </button>

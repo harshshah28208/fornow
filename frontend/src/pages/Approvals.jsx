@@ -69,21 +69,21 @@ export const Approvals = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-brand-400" /> Discount Governance Approval Center
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <ShieldCheck className="w-6 h-6 text-brand-600" /> Discount Governance Approval Center
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 mt-1">
             Review and govern multi-tier quote discount requests based on margin impact and blended risk scores.
           </p>
         </div>
 
         {/* Filter */}
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-slate-400" />
+          <Filter className="w-4 h-4 text-slate-500" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500 font-semibold"
+            className="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-brand-500 font-semibold shadow-sm"
           >
             <option value="PENDING">Pending Approvals</option>
             <option value="APPROVED">Approved History</option>
@@ -108,20 +108,20 @@ export const Approvals = () => {
           {approvals.map((appr) => (
             <div
               key={appr.id}
-              className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 hover:border-slate-700 transition-all shadow-xl"
+              className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4 hover:border-slate-300 transition-all shadow-sm"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2.5">
-                    <h3 className="text-base font-bold text-white">{appr.deal?.title}</h3>
+                    <h3 className="text-base font-bold text-slate-900">{appr.deal?.title}</h3>
                     <StatusBadge status={appr.status} />
                     <RiskBadge riskScore={appr.riskScore} />
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-1.5">
-                    <span>Account: <strong className="text-slate-200">{appr.deal?.account?.name}</strong></span>
+                  <div className="flex items-center gap-3 text-xs text-slate-600 mt-1.5">
+                    <span>Account: <strong className="text-slate-800">{appr.deal?.account?.name}</strong></span>
                     {appr.deal?.account?.tier && <TierBadge tier={appr.deal.account.tier} />}
-                    <span>Requested by: <strong className="text-slate-200">{appr.requestedBy?.firstName} {appr.requestedBy?.lastName}</strong></span>
-                    <span className="font-mono text-[11px] text-slate-400">{new Date(appr.createdAt).toLocaleString()}</span>
+                    <span>Requested by: <strong className="text-slate-800">{appr.requestedBy?.firstName} {appr.requestedBy?.lastName}</strong></span>
+                    <span className="font-mono text-[11px] text-slate-500">{new Date(appr.createdAt).toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -133,7 +133,7 @@ export const Approvals = () => {
                         setDecisionType('APPROVED');
                         setComments('Approved by authorized reviewer.');
                       }}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5 transition-all"
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition-all"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" /> Approve Discount
                     </button>
@@ -143,7 +143,7 @@ export const Approvals = () => {
                         setDecisionType('REJECTED');
                         setComments('Discount too aggressive for target gross margin.');
                       }}
-                      className="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 font-bold rounded-xl text-xs transition-all"
+                      className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl text-xs transition-all"
                     >
                       Reject
                     </button>
@@ -153,7 +153,7 @@ export const Approvals = () => {
                         setDecisionType('REVISION_REQUESTED');
                         setComments('Please reduce discount to 8% or increase subscription duration.');
                       }}
-                      className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-all"
+                      className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all"
                     >
                       Request Revision
                     </button>
@@ -162,11 +162,11 @@ export const Approvals = () => {
               </div>
 
               {/* Justification Box */}
-              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 text-xs space-y-1">
-                <span className="text-slate-400 text-[10px] block uppercase font-bold">Business Justification & Context</span>
-                <p className="text-slate-200">{appr.reason}</p>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                <span className="text-slate-500 text-[10px] block uppercase font-bold">Business Justification & Context</span>
+                <p className="text-slate-800">{appr.reason}</p>
                 {appr.comments && (
-                  <p className="text-brand-300 pt-1 border-t border-slate-850 mt-1">
+                  <p className="text-brand-700 pt-1 border-t border-slate-200 mt-1">
                     <strong>Decision Note:</strong> {appr.comments}
                   </p>
                 )}
@@ -175,21 +175,21 @@ export const Approvals = () => {
               {/* Quote Metrics Summary */}
               {appr.quote && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono pt-1">
-                  <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="text-slate-400 text-[10px] block font-sans">Quote Total</span>
-                    <strong className="text-brand-400 font-bold">₹{appr.quote.totalAmount?.toLocaleString('en-IN')}</strong>
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                    <span className="text-slate-500 text-[10px] block font-sans font-medium">Quote Total</span>
+                    <strong className="text-brand-700 font-bold text-sm">₹{appr.quote.totalAmount?.toLocaleString('en-IN')}</strong>
                   </div>
-                  <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="text-slate-400 text-[10px] block font-sans">Proposed Discount</span>
-                    <strong className="text-amber-400 font-bold">{appr.requestedDiscount}%</strong>
+                  <div className="p-2.5 rounded-lg bg-amber-50/50 border border-amber-200">
+                    <span className="text-amber-800 text-[10px] block font-sans font-medium">Proposed Discount</span>
+                    <strong className="text-amber-700 font-bold text-sm">{appr.requestedDiscount}%</strong>
                   </div>
-                  <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="text-slate-400 text-[10px] block font-sans">Tier Threshold</span>
-                    <strong className="text-slate-300">{appr.thresholdDiscount}% Max</strong>
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                    <span className="text-slate-500 text-[10px] block font-sans font-medium">Tier Threshold</span>
+                    <strong className="text-slate-800 font-bold">{appr.thresholdDiscount}% Max</strong>
                   </div>
-                  <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="text-slate-400 text-[10px] block font-sans">Required Role</span>
-                    <strong className="text-purple-300">{appr.approverRole}</strong>
+                  <div className="p-2.5 rounded-lg bg-purple-50/50 border border-purple-200">
+                    <span className="text-purple-800 text-[10px] block font-sans font-medium">Required Role</span>
+                    <strong className="text-purple-700 font-bold">{appr.approverRole}</strong>
                   </div>
                 </div>
               )}
@@ -205,37 +205,37 @@ export const Approvals = () => {
         title={`Confirm Decision: ${decisionType}`}
       >
         <div className="space-y-4 text-xs">
-          <p className="text-slate-300">
-            You are about to record a decision for Quote <strong>{activeApproval?.quote?.quoteNumber}</strong> ({activeApproval?.deal?.title}).
+          <p className="text-slate-700">
+            You are about to record a decision for Quote <strong className="text-slate-900">{activeApproval?.quote?.quoteNumber}</strong> ({activeApproval?.deal?.title}).
           </p>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Reason / Approver Notes *</label>
+            <label className="block text-slate-700 font-semibold mb-1">Reason / Approver Notes *</label>
             <textarea
               rows={3}
               required
               value={comments}
               onChange={(e) => setComments(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500 text-xs"
+              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-900 focus:outline-none focus:border-brand-500 text-xs shadow-sm"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <button
               onClick={() => setActiveApproval(null)}
-              className="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg font-semibold"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold"
             >
               Cancel
             </button>
             <button
               onClick={handleDecision}
               disabled={submitting}
-              className={`px-5 py-2 font-bold rounded-lg shadow-lg text-slate-950 ${
+              className={`px-5 py-2 font-bold rounded-lg shadow text-white transition-all ${
                 decisionType === 'APPROVED'
-                  ? 'bg-emerald-500 hover:bg-emerald-400 shadow-glow'
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
                   : decisionType === 'REJECTED'
-                  ? 'bg-rose-500 hover:bg-rose-400 text-white'
-                  : 'bg-amber-500 hover:bg-amber-400'
+                  ? 'bg-rose-600 hover:bg-rose-700'
+                  : 'bg-amber-600 hover:bg-amber-700'
               }`}
             >
               {submitting ? 'Recording...' : `Execute ${decisionType}`}

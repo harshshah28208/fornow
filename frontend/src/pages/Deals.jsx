@@ -74,21 +74,21 @@ export const Deals = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">Deals 360 Management</h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Deals 360 Management</h1>
+          <p className="text-xs text-slate-500 mt-1">
             Track deal lifecycles, configure quotations, and monitor revenue conversion.
           </p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs rounded-xl shadow-glow flex items-center gap-1.5 transition-all"
+          className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all"
         >
           <Plus className="w-4 h-4" /> Create Deal
         </button>
       </div>
 
       {/* Filters Bar */}
-      <div className="glass-panel p-4 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+      <div className="glass-panel p-4 rounded-2xl border border-slate-200 bg-white flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <form onSubmit={handleSearchSubmit} className="flex-1 min-w-[260px] relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
@@ -96,18 +96,18 @@ export const Deals = () => {
             placeholder="Search deals or accounts..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
+            className="w-full border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 focus:outline-none focus:border-teal-600"
           />
         </form>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400 flex items-center gap-1">
+          <span className="text-xs text-slate-500 font-bold flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" /> Stage:
           </span>
           <select
             value={stageFilter}
             onChange={(e) => setStageFilter(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
+            className="border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-teal-600"
           >
             <option value="ALL">All Stages</option>
             <option value="LEAD">Lead</option>
@@ -124,7 +124,7 @@ export const Deals = () => {
 
       {/* Deals Table */}
       {loading ? (
-        <LoadingSpinner message="Fetching deals..." />
+        <LoadingSpinner message="Fetching deals from PostgreSQL..." />
       ) : error ? (
         <ErrorAlert message={error} onRetry={fetchDeals} />
       ) : deals.length === 0 ? (
@@ -134,17 +134,17 @@ export const Deals = () => {
           actionButton={
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-brand-500 text-slate-950 font-bold text-xs rounded-xl shadow-glow"
+              className="px-4 py-2 bg-teal-600 text-white font-bold text-xs rounded-xl shadow-sm"
             >
               Create Deal
             </button>
           }
         />
       ) : (
-        <div className="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+        <div className="glass-panel rounded-2xl border border-slate-200 overflow-hidden shadow-xs bg-white">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-slate-950/60 text-slate-400 border-b border-slate-800 uppercase tracking-wider font-semibold">
+              <tr className="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase tracking-wider font-extrabold text-[11px]">
                 <th className="px-6 py-4">Deal Title</th>
                 <th className="px-6 py-4">Account / Tier</th>
                 <th className="px-6 py-4">Value</th>
@@ -153,15 +153,15 @@ export const Deals = () => {
                 <th className="px-6 py-4 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {deals.map((deal) => (
                 <tr
                   key={deal.id}
                   onClick={() => navigate(`/deals/${deal.id}`)}
-                  className="hover:bg-slate-800/40 cursor-pointer transition-colors"
+                  className="hover:bg-slate-50 cursor-pointer transition-colors"
                 >
                   <td className="px-6 py-4">
-                    <p className="font-bold text-white text-sm hover:text-brand-300 transition-colors">
+                    <p className="font-bold text-slate-900 text-sm hover:text-teal-700 transition-colors">
                       {deal.title}
                     </p>
                     <span className="text-[10px] text-slate-400 font-mono">
@@ -170,21 +170,21 @@ export const Deals = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-200">{deal.account?.name}</span>
+                      <span className="font-bold text-slate-800">{deal.account?.name}</span>
                       {deal.account?.tier && <TierBadge tier={deal.account.tier} />}
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-mono font-bold text-brand-400 text-sm">
+                  <td className="px-6 py-4 font-mono font-bold text-teal-700 text-sm">
                     ₹{(deal.value / 100000).toFixed(2)} Lakhs
                   </td>
                   <td className="px-6 py-4">
                     <StageBadge stage={deal.stage} />
                   </td>
-                  <td className="px-6 py-4 text-slate-300">
+                  <td className="px-6 py-4 text-slate-600 font-medium">
                     {deal.owner?.firstName} {deal.owner?.lastName}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <span className="inline-flex items-center gap-1 text-brand-400 font-semibold hover:underline">
+                    <span className="inline-flex items-center gap-1 text-teal-700 font-bold hover:underline">
                       Inspect 360 <ArrowRight className="w-3 h-3" />
                     </span>
                   </td>
@@ -199,25 +199,25 @@ export const Deals = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Deal">
         <form onSubmit={handleCreateDeal} className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Deal Title *</label>
+            <label className="block text-slate-700 font-bold mb-1">Deal Title *</label>
             <input
               type="text"
               required
               placeholder="e.g. Enterprise Cloud & Hardware Upgrade"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500"
+              className="w-full border border-slate-300 rounded-xl p-3 text-slate-900 focus:outline-none focus:border-teal-600"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Target Account *</label>
+              <label className="block text-slate-700 font-bold mb-1">Target Account *</label>
               <select
                 required
                 value={formData.accountId}
                 onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500"
+                className="w-full border border-slate-300 rounded-xl p-3 text-slate-900 focus:outline-none focus:border-teal-600 font-medium"
               >
                 <option value="">Select Account</option>
                 {accounts.map((acc) => (
@@ -229,29 +229,29 @@ export const Deals = () => {
             </div>
 
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Estimated Value (₹)</label>
+              <label className="block text-slate-700 font-bold mb-1">Estimated Value (₹)</label>
               <input
                 type="number"
                 placeholder="500000"
                 value={formData.value}
                 onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500"
+                className="w-full border border-slate-300 rounded-xl p-3 text-slate-900 focus:outline-none focus:border-teal-600 font-mono"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold rounded-lg shadow-glow"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-sm"
             >
               {submitting ? 'Creating...' : 'Create & Open Deal'}
             </button>

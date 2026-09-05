@@ -76,20 +76,20 @@ export const Settings = () => {
   return (
     <div className="space-y-6 pb-12">
       <div>
-        <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-          <SettingsIcon className="w-6 h-6 text-brand-400" /> Platform Governance & Settings
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <SettingsIcon className="w-6 h-6 text-brand-600" /> Platform Governance & Settings
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-600 mt-1">
           Configure discount authorization chains, user access roles, and organizational billing.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800 gap-3 text-xs font-semibold">
+      <div className="flex border-b border-slate-200 gap-3 text-xs font-semibold">
         <button
           onClick={() => setActiveTab('rules')}
           className={`pb-3 px-3 transition-all border-b-2 flex items-center gap-1.5 ${
-            activeTab === 'rules' ? 'border-brand-500 text-brand-400 font-bold' : 'border-transparent text-slate-400'
+            activeTab === 'rules' ? 'border-brand-600 text-brand-700 font-bold' : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <Sliders className="w-4 h-4" /> Discount Governance Rules
@@ -97,7 +97,7 @@ export const Settings = () => {
         <button
           onClick={() => setActiveTab('users')}
           className={`pb-3 px-3 transition-all border-b-2 flex items-center gap-1.5 ${
-            activeTab === 'users' ? 'border-brand-500 text-brand-400 font-bold' : 'border-transparent text-slate-400'
+            activeTab === 'users' ? 'border-brand-600 text-brand-700 font-bold' : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <Users className="w-4 h-4" /> Users & Permissions
@@ -105,7 +105,7 @@ export const Settings = () => {
         <button
           onClick={() => setActiveTab('billing')}
           className={`pb-3 px-3 transition-all border-b-2 flex items-center gap-1.5 ${
-            activeTab === 'billing' ? 'border-brand-500 text-brand-400 font-bold' : 'border-transparent text-slate-400'
+            activeTab === 'billing' ? 'border-brand-600 text-brand-700 font-bold' : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <CreditCard className="w-4 h-4" /> Organization Subscription & Plans
@@ -117,12 +117,12 @@ export const Settings = () => {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-sm font-bold text-white">Configurable Discount Ceilings</h3>
-              <p className="text-xs text-slate-400">Rules applied dynamically when sales reps build quotations.</p>
+              <h3 className="text-sm font-bold text-slate-900">Configurable Discount Ceilings</h3>
+              <p className="text-xs text-slate-600">Rules applied dynamically when sales reps build quotations.</p>
             </div>
             <button
               onClick={() => setIsRuleModalOpen(true)}
-              className="px-3.5 py-1.5 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold rounded-lg text-xs shadow-glow flex items-center gap-1"
+              className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-xs shadow-sm flex items-center gap-1 transition-all"
             >
               <Plus className="w-3.5 h-3.5" /> Add Rule
             </button>
@@ -132,28 +132,28 @@ export const Settings = () => {
             {discountRules.map((rule) => (
               <div
                 key={rule.id}
-                className="glass-panel p-5 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-4"
+                className="bg-white p-5 rounded-2xl border border-slate-200 flex flex-wrap items-center justify-between gap-4 shadow-sm"
               >
                 <div>
-                  <h4 className="text-sm font-bold text-white">{rule.name}</h4>
-                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                    <span>Customer Tier: <strong className="text-slate-200">{rule.customerTier}</strong></span>
-                    <span>Category: <strong className="text-slate-200">{rule.productCategory}</strong></span>
+                  <h4 className="text-sm font-bold text-slate-900">{rule.name}</h4>
+                  <div className="flex items-center gap-3 text-xs text-slate-600 mt-1">
+                    <span>Customer Tier: <strong className="text-slate-800">{rule.customerTier}</strong></span>
+                    <span>Category: <strong className="text-slate-800">{rule.productCategory}</strong></span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4 text-xs font-mono">
-                  <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 text-center">
-                    <span className="text-slate-400 text-[10px] block font-sans">Rep Limit</span>
-                    <strong className="text-emerald-400 font-bold">≤ {rule.maxRepDiscount}%</strong>
+                  <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-center">
+                    <span className="text-emerald-800 text-[10px] block font-sans font-medium">Rep Limit</span>
+                    <strong className="text-emerald-700 font-bold">≤ {rule.maxRepDiscount}%</strong>
                   </div>
-                  <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 text-center">
-                    <span className="text-slate-400 text-[10px] block font-sans">Manager Limit</span>
-                    <strong className="text-amber-400 font-bold">≤ {rule.maxManagerDiscount}%</strong>
+                  <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-center">
+                    <span className="text-amber-800 text-[10px] block font-sans font-medium">Manager Limit</span>
+                    <strong className="text-amber-700 font-bold">≤ {rule.maxManagerDiscount}%</strong>
                   </div>
-                  <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 text-center">
-                    <span className="text-slate-400 text-[10px] block font-sans">Finance Limit</span>
-                    <strong className="text-rose-400 font-bold">≤ {rule.maxFinanceDiscount}%</strong>
+                  <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-center">
+                    <span className="text-rose-800 text-[10px] block font-sans font-medium">Finance Limit</span>
+                    <strong className="text-rose-700 font-bold">≤ {rule.maxFinanceDiscount}%</strong>
                   </div>
                 </div>
               </div>
@@ -165,11 +165,11 @@ export const Settings = () => {
       {/* Users Tab */}
       {activeTab === 'users' && (
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-white">Active Team Members & Role Assignments</h3>
-          <div className="glass-panel rounded-2xl border border-slate-800 overflow-hidden">
+          <h3 className="text-sm font-bold text-slate-900">Active Team Members & Role Assignments</h3>
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-slate-400 bg-slate-950/60 border-b border-slate-800 uppercase font-semibold">
+                <tr className="text-slate-600 bg-slate-50 border-b border-slate-200 uppercase font-semibold">
                   <th className="p-4">Name</th>
                   <th className="p-4">Email</th>
                   <th className="p-4">System Role</th>
@@ -177,18 +177,18 @@ export const Settings = () => {
                   <th className="p-4 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="p-4 font-bold text-white">{u.firstName} {u.lastName}</td>
-                    <td className="p-4 text-slate-300 font-mono text-[11px]">{u.email}</td>
+                  <tr key={u.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="p-4 font-bold text-slate-900">{u.firstName} {u.lastName}</td>
+                    <td className="p-4 text-slate-600 font-mono text-[11px]">{u.email}</td>
                     <td className="p-4">
-                      <span className="px-2.5 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-[10px] font-mono font-bold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-[10px] font-mono font-bold">
                         {u.role}
                       </span>
                     </td>
-                    <td className="p-4 font-mono text-slate-300">{u.historicalAvgDiscount || 5.0}%</td>
-                    <td className="p-4 text-right text-emerald-400 font-semibold">Active</td>
+                    <td className="p-4 font-mono text-slate-800">{u.historicalAvgDiscount || 5.0}%</td>
+                    <td className="p-4 text-right text-emerald-700 font-semibold">Active</td>
                   </tr>
                 ))}
               </tbody>
@@ -200,10 +200,10 @@ export const Settings = () => {
       {/* Billing Tab */}
       {activeTab === 'billing' && (
         <div className="space-y-6 text-xs">
-          <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-2">
-            <h3 className="text-sm font-bold text-white">Current Organization Tier: {billing?.currentPlan}</h3>
-            <p className="text-slate-300">
-              Subscription Status: <strong className="text-emerald-400 font-mono">ACTIVE</strong> • Active Users: <strong>{billing?.activeUsersCount} / {billing?.maxUsers}</strong>
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-2 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-900">Current Organization Tier: {billing?.currentPlan}</h3>
+            <p className="text-slate-700">
+              Subscription Status: <strong className="text-emerald-700 font-mono">ACTIVE</strong> • Active Users: <strong className="text-slate-900">{billing?.activeUsersCount} / {billing?.maxUsers}</strong>
             </p>
           </div>
 
@@ -211,21 +211,21 @@ export const Settings = () => {
             {billing?.availablePlans?.map((plan) => (
               <div
                 key={plan.id}
-                className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 ${
+                className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 shadow-sm ${
                   billing?.currentPlan === plan.id
-                    ? 'bg-brand-950/20 border-brand-500/50 shadow-glow'
-                    : 'bg-slate-900 border-slate-800'
+                    ? 'bg-brand-50/50 border-brand-500'
+                    : 'bg-white border-slate-200'
                 }`}
               >
                 <div>
-                  <h4 className="text-base font-bold text-white">{plan.name}</h4>
-                  <strong className="text-xl font-mono text-brand-400 block mt-2">
-                    ₹{plan.price.toLocaleString('en-IN')}<span className="text-xs text-slate-400">/mo</span>
+                  <h4 className="text-base font-bold text-slate-900">{plan.name}</h4>
+                  <strong className="text-xl font-mono text-brand-700 block mt-2">
+                    ₹{plan.price.toLocaleString('en-IN')}<span className="text-xs text-slate-500 font-sans font-normal">/mo</span>
                   </strong>
-                  <ul className="mt-4 space-y-2 text-slate-300">
+                  <ul className="mt-4 space-y-2 text-slate-700">
                     {plan.features.map((f, i) => (
                       <li key={i} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-400 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-600 flex-shrink-0" />
                         <span>{f}</span>
                       </li>
                     ))}
@@ -235,10 +235,10 @@ export const Settings = () => {
                 <button
                   onClick={() => handleUpgradePlan(plan.id)}
                   disabled={billing?.currentPlan === plan.id}
-                  className={`w-full py-2 rounded-xl font-bold transition-all ${
+                  className={`w-full py-2 rounded-xl font-bold transition-all text-xs ${
                     billing?.currentPlan === plan.id
-                      ? 'bg-slate-800 text-slate-400 cursor-default'
-                      : 'bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-glow'
+                      ? 'bg-slate-100 text-slate-500 cursor-default border border-slate-200'
+                      : 'bg-brand-600 hover:bg-brand-700 text-white shadow-sm'
                   }`}
                 >
                   {billing?.currentPlan === plan.id ? 'Current Plan' : 'Select Plan'}
@@ -253,23 +253,23 @@ export const Settings = () => {
       <Modal isOpen={isRuleModalOpen} onClose={() => setIsRuleModalOpen(false)} title="Create Discount Governance Rule">
         <form onSubmit={handleCreateRule} className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Rule Name *</label>
+            <label className="block text-slate-700 font-semibold mb-1">Rule Name *</label>
             <input
               type="text"
               required
               value={ruleForm.name}
               onChange={(e) => setRuleForm({ ...ruleForm, name: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500"
+              className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:border-brand-500 shadow-sm"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Customer Tier</label>
+              <label className="block text-slate-700 font-semibold mb-1">Customer Tier</label>
               <select
                 value={ruleForm.customerTier}
                 onChange={(e) => setRuleForm({ ...ruleForm, customerTier: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500"
+                className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:border-brand-500 shadow-sm"
               >
                 <option value="ALL">All Tiers</option>
                 <option value="GOLD">Gold</option>
@@ -278,11 +278,11 @@ export const Settings = () => {
               </select>
             </div>
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Product Category</label>
+              <label className="block text-slate-700 font-semibold mb-1">Product Category</label>
               <select
                 value={ruleForm.productCategory}
                 onChange={(e) => setRuleForm({ ...ruleForm, productCategory: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500"
+                className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:border-brand-500 shadow-sm"
               >
                 <option value="ALL">All Categories</option>
                 <option value="HARDWARE">Hardware</option>
@@ -294,37 +294,37 @@ export const Settings = () => {
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Rep Max %</label>
+              <label className="block text-slate-700 font-semibold mb-1">Rep Max %</label>
               <input
                 type="number"
                 value={ruleForm.maxRepDiscount}
                 onChange={(e) => setRuleForm({ ...ruleForm, maxRepDiscount: parseFloat(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 font-mono"
+                className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 font-mono shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Manager Max %</label>
+              <label className="block text-slate-700 font-semibold mb-1">Manager Max %</label>
               <input
                 type="number"
                 value={ruleForm.maxManagerDiscount}
                 onChange={(e) => setRuleForm({ ...ruleForm, maxManagerDiscount: parseFloat(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 font-mono"
+                className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 font-mono shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Finance Max %</label>
+              <label className="block text-slate-700 font-semibold mb-1">Finance Max %</label>
               <input
                 type="number"
                 value={ruleForm.maxFinanceDiscount}
                 onChange={(e) => setRuleForm({ ...ruleForm, maxFinanceDiscount: parseFloat(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 font-mono"
+                className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 font-mono shadow-sm"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
-            <button type="button" onClick={() => setIsRuleModalOpen(false)} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Cancel</button>
-            <button type="submit" className="px-5 py-2 bg-brand-500 text-slate-950 font-bold rounded-lg shadow-glow">
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-200">
+            <button type="button" onClick={() => setIsRuleModalOpen(false)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
+            <button type="submit" className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-sm">
               Save Rule
             </button>
           </div>

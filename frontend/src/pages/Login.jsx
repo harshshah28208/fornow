@@ -49,65 +49,65 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center p-6">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Banner */}
         <div className="text-center space-y-2">
-          <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-teal-400 items-center justify-center text-slate-950 font-black text-xl shadow-glow">
+          <div className="inline-flex w-12 h-12 rounded-2xl bg-brand-600 items-center justify-center text-white font-black text-xl shadow-md">
             360
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
-            DealFlow<span className="text-brand-400">360</span>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            DealFlow<span className="text-brand-600">360</span>
           </h1>
-          <p className="text-xs text-slate-400">Rule-Driven B2B Deal Engine & Revenue Operations</p>
+          <p className="text-xs text-slate-600 font-medium">Rule-Driven B2B Deal Engine & Revenue Operations</p>
         </div>
 
         {/* Login Card */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 shadow-2xl space-y-5">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-md space-y-5">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800 text-rose-300 text-xs">
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
               {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4 text-xs">
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Work Email</label>
+              <label className="block text-slate-700 font-semibold mb-1">Work Email</label>
               <input
                 type="email"
                 required
                 placeholder="you@dealflow360.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500 font-mono"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:border-brand-500 font-mono shadow-sm"
               />
             </div>
 
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Password</label>
+              <label className="block text-slate-700 font-semibold mb-1">Password</label>
               <input
                 type="password"
                 required
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:border-brand-500 shadow-sm"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-brand-600 to-teal-500 hover:from-brand-500 hover:to-teal-400 text-slate-950 font-black rounded-xl shadow-glow text-xs flex items-center justify-center gap-1.5 transition-all"
+              className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-xl shadow-sm text-xs flex items-center justify-center gap-1.5 transition-all"
             >
               {loading ? 'Authenticating...' : 'Sign In to Workspace'} <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
           {/* Quick Demo Persona Switcher */}
-          <div className="pt-4 border-t border-slate-800 space-y-2">
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-brand-400" /> 1-Click Persona Quick Login:
+          <div className="pt-4 border-t border-slate-100 space-y-2">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-brand-600" /> 1-Click Persona Quick Login:
             </span>
             <div className="space-y-1.5">
               {demoAccounts.map((acc) => (
@@ -115,15 +115,15 @@ export const Login = () => {
                   key={acc.email}
                   type="button"
                   onClick={() => handleQuickDemoLogin(acc.email)}
-                  className="w-full p-2 rounded-lg bg-slate-950/80 hover:bg-slate-800/80 border border-slate-800 text-left flex items-center justify-between text-xs transition-all group"
+                  className="w-full p-2 rounded-lg bg-slate-50 hover:bg-brand-50/60 border border-slate-200 text-left flex items-center justify-between text-xs transition-all group"
                 >
                   <div>
-                    <span className="font-bold text-slate-200 group-hover:text-brand-300 transition-colors">
+                    <span className="font-bold text-slate-800 group-hover:text-brand-700 transition-colors">
                       {acc.role}
                     </span>
-                    <p className="text-[10px] text-slate-400">{acc.desc}</p>
+                    <p className="text-[10px] text-slate-500">{acc.desc}</p>
                   </div>
-                  <span className="text-[10px] font-mono text-brand-400">Demo Login →</span>
+                  <span className="text-[10px] font-mono text-brand-700 font-semibold">Demo Login →</span>
                 </button>
               ))}
             </div>

@@ -67,10 +67,10 @@ export const Contracts = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            <FileSignature className="w-6 h-6 text-brand-400" /> Contracts & Legal Review
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <FileSignature className="w-6 h-6 text-brand-600" /> Contracts & Legal Review
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 mt-1">
             Manage legal compliance, terms revisions, and electronic execution for approved deals.
           </p>
         </div>
@@ -90,25 +90,25 @@ export const Contracts = () => {
           {contracts.map((c) => (
             <div
               key={c.id}
-              className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 shadow-xl"
+              className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4 shadow-sm"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2.5">
-                    <h3 className="text-base font-bold text-white">{c.contractNumber} - {c.title}</h3>
+                    <h3 className="text-base font-bold text-slate-900">{c.contractNumber} - {c.title}</h3>
                     <StatusBadge status={c.status} />
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-slate-400 mt-1.5">
-                    <span>Account: <strong className="text-slate-200">{c.account?.name}</strong></span>
-                    <span>Deal: <strong className="text-slate-200">{c.deal?.title}</strong></span>
-                    <span className="font-mono">Created: {new Date(c.createdAt).toLocaleDateString()}</span>
+                  <div className="flex items-center gap-4 text-xs text-slate-600 mt-1.5">
+                    <span>Account: <strong className="text-slate-800">{c.account?.name}</strong></span>
+                    <span>Deal: <strong className="text-slate-800">{c.deal?.title}</strong></span>
+                    <span className="font-mono text-slate-500">Created: {new Date(c.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <span className="text-[10px] text-slate-400 block font-semibold uppercase">Contract Value</span>
-                    <strong className="text-base font-mono font-bold text-brand-400">
+                    <span className="text-[10px] text-slate-500 block font-semibold uppercase">Contract Value</span>
+                    <strong className="text-base font-mono font-bold text-brand-700">
                       ₹{c.value?.toLocaleString('en-IN')}
                     </strong>
                   </div>
@@ -121,7 +121,7 @@ export const Contracts = () => {
                         setReviewNotes('Standard terms verified and approved.');
                         setReviewDecision('APPROVED');
                       }}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-1.5"
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5"
                     >
                       <ShieldCheck className="w-3.5 h-3.5" /> Legal Review
                     </button>
@@ -130,7 +130,7 @@ export const Contracts = () => {
                   {c.status === 'APPROVED' && (
                     <button
                       onClick={() => handleSignContract(c.id, c.account?.name)}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-1.5"
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" /> Sign & Execute
                     </button>
@@ -139,15 +139,15 @@ export const Contracts = () => {
               </div>
 
               {/* Terms Content Preview */}
-              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs">
-                <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">Contract Terms & SLA</span>
-                <pre className="font-mono text-slate-300 whitespace-pre-wrap max-h-32 overflow-y-auto leading-relaxed text-[11px]">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                <span className="text-[10px] text-slate-500 block uppercase font-bold mb-1">Contract Terms & SLA</span>
+                <pre className="font-mono text-slate-800 whitespace-pre-wrap max-h-32 overflow-y-auto leading-relaxed text-[11px]">
                   {c.terms}
                 </pre>
               </div>
 
               {c.legalNotes && (
-                <p className="text-xs text-brand-300">
+                <p className="text-xs text-brand-700">
                   <strong>Legal Counsel Notes:</strong> {c.legalNotes}
                 </p>
               )}
@@ -163,20 +163,20 @@ export const Contracts = () => {
         title="Conduct Legal Counsel Review"
       >
         <div className="space-y-4 text-xs">
-          <p className="text-slate-300">
-            Reviewing contract terms for <strong>{activeContract?.account?.name}</strong> (Value: ₹{activeContract?.value?.toLocaleString('en-IN')}).
+          <p className="text-slate-700">
+            Reviewing contract terms for <strong className="text-slate-900">{activeContract?.account?.name}</strong> (Value: ₹{activeContract?.value?.toLocaleString('en-IN')}).
           </p>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Review Decision</label>
+            <label className="block text-slate-700 font-semibold mb-1">Review Decision</label>
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => setReviewDecision('APPROVED')}
                 className={`flex-1 py-2 rounded-lg font-bold border transition-all ${
                   reviewDecision === 'APPROVED'
-                    ? 'bg-emerald-600/30 border-emerald-500 text-emerald-300'
-                    : 'bg-slate-950 border-slate-800 text-slate-400'
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-800'
+                    : 'bg-slate-50 border-slate-300 text-slate-600'
                 }`}
               >
                 Approve Contract
@@ -186,8 +186,8 @@ export const Contracts = () => {
                 onClick={() => setReviewDecision('CHANGES_REQUESTED')}
                 className={`flex-1 py-2 rounded-lg font-bold border transition-all ${
                   reviewDecision === 'CHANGES_REQUESTED'
-                    ? 'bg-amber-600/30 border-amber-500 text-amber-300'
-                    : 'bg-slate-950 border-slate-800 text-slate-400'
+                    ? 'bg-amber-50 border-amber-500 text-amber-800'
+                    : 'bg-slate-50 border-slate-300 text-slate-600'
                 }`}
               >
                 Request Changes
@@ -196,36 +196,36 @@ export const Contracts = () => {
           </div>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Legal Review Notes *</label>
+            <label className="block text-slate-700 font-semibold mb-1">Legal Review Notes *</label>
             <textarea
               rows={2}
               value={reviewNotes}
               onChange={(e) => setReviewNotes(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-brand-500 text-xs"
+              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-900 focus:outline-none focus:border-brand-500 text-xs shadow-sm"
             />
           </div>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Terms Modifications (Creates new version)</label>
+            <label className="block text-slate-700 font-semibold mb-1">Terms Modifications (Creates new version)</label>
             <textarea
               rows={6}
               value={revisedTerms}
               onChange={(e) => setRevisedTerms(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-200 font-mono focus:outline-none focus:border-brand-500 text-[11px]"
+              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-900 font-mono focus:outline-none focus:border-brand-500 text-[11px] shadow-sm"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex justify-end gap-3 pt-3 border-t border-slate-200">
             <button
               onClick={() => setActiveContract(null)}
-              className="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold"
             >
               Cancel
             </button>
             <button
               onClick={handleLegalReview}
               disabled={submittingReview}
-              className="px-5 py-2 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold rounded-lg shadow-glow"
+              className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow-sm transition-all"
             >
               {submittingReview ? 'Submitting...' : 'Confirm Review'}
             </button>

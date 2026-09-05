@@ -245,8 +245,13 @@ const getQuoteById = async (req, res) => {
 const getPortalQuote = async (req, res) => {
   try {
     const { id } = req.params;
-    const quote = await prisma.quote.findUnique({
-      where: { id },
+    const quote = await prisma.quote.findFirst({
+      where: {
+        OR: [
+          { id: id },
+          { quoteNumber: id },
+        ],
+      },
       include: {
         deal: {
           select: {

@@ -44,10 +44,10 @@ export const Revenue = () => {
     <div className="space-y-8 pb-12">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-          <TrendingUp className="w-6 h-6 text-brand-400" /> Revenue Operations & Recognized ARR
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <TrendingUp className="w-6 h-6 text-brand-600" /> Revenue Operations & Recognized ARR
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-600 mt-1">
           Hybrid monetization telemetry: one-time hardware sales, implementation services, and recurring subscriptions.
         </p>
       </div>
@@ -83,20 +83,20 @@ export const Revenue = () => {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Revenue Trend */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-brand-400" /> Monthly Revenue Recognized
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-brand-600" /> Monthly Revenue Recognized
           </h3>
           <div className="space-y-3 pt-2">
             {monthlyTrend?.map((item) => (
               <div key={item.month} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300 font-semibold">{item.month}</span>
-                  <span className="font-mono text-brand-400 font-bold">₹{item.revenue.toLocaleString('en-IN')}</span>
+                  <span className="text-slate-700 font-semibold">{item.month}</span>
+                  <span className="font-mono text-brand-700 font-bold">₹{item.revenue.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-brand-600 to-teal-400"
+                    className="h-full rounded-full bg-brand-600"
                     style={{ width: `${Math.min(100, Math.max(15, (item.revenue / (totalRecognizedRevenue || 1)) * 100))}%` }}
                   />
                 </div>
@@ -106,20 +106,20 @@ export const Revenue = () => {
         </div>
 
         {/* Revenue by Sales Rep */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Users className="w-4 h-4 text-brand-400" /> Revenue by Account Executive
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Users className="w-4 h-4 text-brand-600" /> Revenue by Account Executive
           </h3>
           <div className="space-y-3 pt-2">
             {repRevenueData?.map((rep) => (
               <div key={rep.name} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300 font-semibold">{rep.name}</span>
-                  <span className="font-mono text-brand-400 font-bold">₹{rep.amount.toLocaleString('en-IN')}</span>
+                  <span className="text-slate-700 font-semibold">{rep.name}</span>
+                  <span className="font-mono text-brand-700 font-bold">₹{rep.amount.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-400"
+                    className="h-full rounded-full bg-emerald-500"
                     style={{ width: `${Math.min(100, Math.max(20, (rep.amount / (totalRecognizedRevenue || 1)) * 100))}%` }}
                   />
                 </div>
@@ -130,12 +130,12 @@ export const Revenue = () => {
       </div>
 
       {/* Recent Ledger Entries */}
-      <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
-        <h3 className="text-sm font-bold text-white">Recognized Revenue Ledger</h3>
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 className="text-sm font-bold text-slate-900">Recognized Revenue Ledger</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="text-slate-400 border-b border-slate-800 font-semibold">
+              <tr className="text-slate-500 border-b border-slate-200 font-semibold">
                 <th className="pb-3">Client Account</th>
                 <th className="pb-3">Monetization Type</th>
                 <th className="pb-3">Amount Recognized</th>
@@ -143,20 +143,20 @@ export const Revenue = () => {
                 <th className="pb-3 text-right">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {recentRecords?.map((rec) => (
-                <tr key={rec.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="py-3 font-semibold text-white">{rec.account?.name || 'Enterprise Client'}</td>
+                <tr key={rec.id} className="hover:bg-slate-50/70 transition-colors">
+                  <td className="py-3 font-semibold text-slate-900">{rec.account?.name || 'Enterprise Client'}</td>
                   <td className="py-3">
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono font-bold text-slate-300">
+                    <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-mono font-bold text-slate-700">
                       {rec.type}
                     </span>
                   </td>
-                  <td className="py-3 font-mono font-bold text-emerald-400">
+                  <td className="py-3 font-mono font-bold text-emerald-700">
                     +₹{rec.amount.toLocaleString('en-IN')}
                   </td>
-                  <td className="py-3 text-slate-400 text-[11px]">{rec.notes}</td>
-                  <td className="py-3 text-right font-mono text-slate-400">
+                  <td className="py-3 text-slate-600 text-[11px]">{rec.notes}</td>
+                  <td className="py-3 text-right font-mono text-slate-500">
                     {new Date(rec.recognizedDate).toLocaleDateString()}
                   </td>
                 </tr>

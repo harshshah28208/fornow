@@ -181,6 +181,30 @@ const updateProduct = async (req, res) => {
 // ----------------------------------------
 // Warehouses & Stock
 // ----------------------------------------
+const createWarehouse = async (req, res) => {
+  try {
+    const { name, code, location, shippingCostWeight, isMain } = req.body;
+    if (!name || !code) {
+      return error(res, 'Warehouse name and code are required', null, 400);
+    }
+
+    const warehouse = await prisma.warehouse.create({
+      data: {
+        organizationId: req.organizationId,
+        name,
+        code: code.toUpperCase().trim(),
+        location,
+        shippingCostWeight: shippingCostWeight ? parseFloat(shippingCostWeight) : 1.0,
+        isMain: Boolean(isMain),
+      },
+    });
+
+    return success(res, 'Warehouse created successfully', warehouse, 201);
+  } catch (err) {
+    return error(res, 'Failed to create warehouse', err.message, 500);
+  }
+};
+
 const getWarehouses = async (req, res) => {
   try {
     const warehouses = await prisma.warehouse.findMany({
@@ -250,6 +274,7 @@ module.exports = {
   getProducts,
   createProduct,
   updateProduct,
+  createWarehouse,
   getWarehouses,
   updateStockLevel,
   getUpsells,

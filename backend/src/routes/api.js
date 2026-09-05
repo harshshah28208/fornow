@@ -69,6 +69,7 @@ router.get('/products', productController.getProducts);
 router.post('/products', productController.createProduct);
 router.put('/products/:id', productController.updateProduct);
 router.get('/warehouses', productController.getWarehouses);
+router.post('/warehouses', productController.createWarehouse);
 router.post('/stock/update', productController.updateStockLevel);
 router.get('/upsells', productController.getUpsells);
 
