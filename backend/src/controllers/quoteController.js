@@ -291,8 +291,13 @@ const submitCustomerNegotiation = async (req, res) => {
     const { id } = req.params;
     const { feedback, counterDiscountPercent, isAccepted } = req.body;
 
-    const quote = await prisma.quote.findUnique({
-      where: { id },
+    const quote = await prisma.quote.findFirst({
+      where: {
+        OR: [
+          { id: id },
+          { quoteNumber: id },
+        ],
+      },
       include: { deal: { include: { account: true, owner: true } }, items: { include: { product: true } } },
     });
 
@@ -303,7 +308,7 @@ const submitCustomerNegotiation = async (req, res) => {
     if (isAccepted) {
       // Customer confirmed quote terms
       const updated = await prisma.quote.update({
-        where: { id },
+        where: { id: quote.id },
         data: {
           status: 'ACCEPTED',
           acceptedAt: new Date(),
@@ -316,7 +321,7 @@ const submitCustomerNegotiation = async (req, res) => {
         data: { stage: 'CONTRACT_REVIEW', lastActivityAt: new Date() },
       });
 
-      if (quote.deal.ownerId) {
+      if (quote.deal?.ownerId) {
         await sendNotification({
           organizationId: quote.organizationId,
           userId: quote.deal.ownerId,
@@ -337,9 +342,9 @@ const submitCustomerNegotiation = async (req, res) => {
     // Evaluate if counter-discount exceeds allowed threshold and triggers re-approval
     const discountEval = await evaluateQuoteDiscount({
       organizationId: quote.organizationId,
-      customerTier: quote.deal.account.tier,
+      customerTier: quote.deal?.account?.tier || 'STANDARD',
       items: quote.items.map((it) => ({
-        category: it.product.category,
+        category: it.product?.category || 'SUBSCRIPTION',
         unitPrice: it.unitPrice,
         quantity: it.quantity,
         discountPercent: counterPct > 0 ? counterPct : it.discountPercent,
@@ -351,7 +356,7 @@ const submitCustomerNegotiation = async (req, res) => {
     const newStatus = discountEval.requiresApproval ? 'PENDING_APPROVAL' : 'NEGOTIATION';
 
     const updated = await prisma.quote.update({
-      where: { id },
+      where: { id: quote.id },
       data: {
         status: newStatus,
         customerFeedback: feedback,
@@ -375,19 +380,19 @@ const submitCustomerNegotiation = async (req, res) => {
           organizationId: quote.organizationId,
           quoteId: quote.id,
           dealId: quote.dealId,
-          requestedById: quote.deal.ownerId || quote.deal.accountId,
-          approverRole: discountEval.requiredApprovalRole,
+          requestedById: quote.deal?.ownerId || quote.deal?.accountId || quote.organizationId,
+          approverRole: discountEval.requiredApprovalRole || 'SALES_MANAGER',
           requestedDiscount: counterPct,
-          thresholdDiscount: quote.deal.account.tier === 'GOLD' ? 15 : 10,
-          riskScore: discountEval.blendedRiskScore,
-          reason: `Customer counter-offer of ${counterPct}% requires re-approval. Customer note: ${feedback}`,
+          thresholdDiscount: quote.deal?.account?.tier === 'GOLD' ? 15 : 10,
+          riskScore: discountEval.blendedRiskScore || 0,
+          reason: `Customer counter-offer of ${counterPct}% requires re-approval. Customer note: ${feedback || 'None'}`,
           status: 'PENDING',
         },
       });
 
       await notifyRole({
         organizationId: quote.organizationId,
-        role: discountEval.requiredApprovalRole,
+        role: discountEval.requiredApprovalRole || 'SALES_MANAGER',
         title: `Customer Counter-Offer Re-Approval Needed`,
         message: `Customer countered with ${counterPct}% discount on quote ${quote.quoteNumber}.`,
         type: 'APPROVAL_REQUEST',
